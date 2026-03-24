@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useRef, useState } from "react";
 import axios from "axios";
 
 const API_BASE = "http://localhost:8000";
@@ -9,36 +9,106 @@ function App() {
   const [analysis, setAnalysis] = useState(null);
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
-  const [listening, setListening] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
 
-  const speechSupported = useMemo(
-    () => Boolean(window.SpeechRecognition || window.webkitSpeechRecognition),
-    []
-  );
+  const mediaRecorderRef = useRef(null);
+  const mediaStreamRef = useRef(null);
+  const chunksRef = useRef([]);
+  const mimeTypeRef = useRef("audio/webm");
 
-  const startMic = () => {
-    if (!speechSupported) {
-      setError("Browser speech recognition is not supported.");
+  const stopStream = () => {
+    try {
+      const stream = mediaStreamRef.current;
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+    } finally {
+      mediaStreamRef.current = null;
+    }
+  };
+
+  const chooseMimeType = () => {
+    // Pick the most compatible recording format for the current browser.
+    if (typeof MediaRecorder === "undefined") return "audio/webm";
+    if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) return "audio/webm;codecs=opus";
+    if (MediaRecorder.isTypeSupported("audio/webm")) return "audio/webm";
+    if (MediaRecorder.isTypeSupported("audio/ogg;codecs=opus")) return "audio/ogg;codecs=opus";
+    if (MediaRecorder.isTypeSupported("audio/ogg")) return "audio/ogg";
+    return "audio/webm";
+  };
+
+  const startMic = async () => {
+    if (isRecording) return;
+    setError("");
+    setAnalysis(null);
+    setReport(null);
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError("Microphone not supported in this browser.");
       return;
     }
-    setError("");
-    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new Recognition();
-    recognition.lang = "en-IN";
-    recognition.interimResults = false;
-    recognition.continuous = false;
-    setListening(true);
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setRawText((prev) => (prev ? `${prev} ${transcript}` : transcript));
-    };
-    recognition.onerror = () => {
-      setError("Could not capture voice input.");
-    };
-    recognition.onend = () => {
-      setListening(false);
-    };
-    recognition.start();
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+
+      chunksRef.current = [];
+      const mimeType = chooseMimeType();
+      mimeTypeRef.current = mimeType;
+
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) chunksRef.current.push(event.data);
+      };
+
+      recorder.onerror = () => {
+        setError("Could not capture voice input.");
+        setIsRecording(false);
+        stopStream();
+      };
+
+      recorder.onstop = async () => {
+        setIsRecording(false);
+        stopStream();
+        setTranscribing(true);
+        setError("");
+        try {
+          const blob = new Blob(chunksRef.current, { type: mimeTypeRef.current || "audio/webm" });
+          const fileExt = (mimeTypeRef.current || "").includes("ogg") ? "ogg" : "webm";
+          const formData = new FormData();
+          formData.append("audio", blob, `voice.${fileExt}`);
+
+          const res = await axios.post(`${API_BASE}/transcribe`, formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+          });
+          setRawText(res.data.text || "");
+        } catch (err) {
+          setError(err?.response?.data?.detail || "Transcription failed.");
+        } finally {
+          setTranscribing(false);
+          mediaRecorderRef.current = null;
+          chunksRef.current = [];
+        }
+      };
+
+      recorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      setError(err?.message || "Microphone permission denied.");
+    }
+  };
+
+  const toggleRecording = async () => {
+    if (isRecording) {
+      try {
+        mediaRecorderRef.current?.stop();
+      } catch {
+        setIsRecording(false);
+      }
+      return;
+    }
+    await startMic();
   };
 
   const analyze = async () => {
@@ -85,18 +155,19 @@ function App() {
         rows={6}
         value={rawText}
         onChange={(e) => setRawText(e.target.value)}
-        placeholder="Type complaint in English, Malayalam, Hindi, or mixed..."
+        placeholder="Type complaint in English, Malayalam, Hindi, or mixed... (or use voice)"
       />
 
       <div className="button-row">
-        <button onClick={startMic} disabled={listening}>
-          {listening ? "Listening..." : "Microphone"}
+        <button onClick={toggleRecording} disabled={loading || transcribing}>
+          {isRecording ? "Stop recording" : "Microphone"}
         </button>
         <button onClick={analyze} disabled={loading}>
           {loading ? "Analyzing..." : "Analyze"}
         </button>
       </div>
 
+      {transcribing && <div className="card">Transcribing audio (multilingual)...</div>}
       {loading && <div className="card">Processing request...</div>}
       {error && <div className="error">{error}</div>}
 
