@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top, #f2fbff 0%, #edf7f4 40%, #f7fbff 100%);
+  color: #1f2937;
+}
+
+#root {
+  min-height: 100vh;
+}
