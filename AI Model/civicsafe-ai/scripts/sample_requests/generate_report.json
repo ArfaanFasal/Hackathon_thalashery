@@ -1,0 +1,38 @@
+{
+  "raw_text": "Pani nahi aa raha in Kakkanad",
+  "analysis": {
+    "intent": {
+      "intent": "complaint_report",
+      "confidence": 0.82
+    },
+    "structured_data": {
+      "issue_type": "Water Shortage",
+      "location": "Kakkanad",
+      "urgency": "Medium",
+      "summary": "Pani nahi aa raha in Kakkanad",
+      "category": "Utilities",
+      "detected_language": "Mixed (Hindi + English)",
+      "required_department": "Water Authority",
+      "priority_tag": "standard",
+      "suggested_next_step": "Register municipal complaint ticket.",
+      "cluster_key": "utilities_water_shortage_kakkanad"
+    },
+    "scam_analysis": {
+      "scam_detected": false,
+      "scam_type": "none",
+      "risk_level": "low",
+      "recommendation": "No scam indicators found."
+    },
+    "cluster_info": {
+      "cluster_key": "utilities_water_shortage_kakkanad",
+      "cluster_ready": true
+    },
+    "confidence": {
+      "overall_confidence": 0.806,
+      "intent_confidence": 0.82,
+      "structure_confidence": 0.9,
+      "scam_confidence": 0.7
+    },
+    "report_available": true
+  }
+}
