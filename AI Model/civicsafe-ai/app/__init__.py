@@ -1,0 +1,1 @@
+"""CivicSafe AI backend package."""
