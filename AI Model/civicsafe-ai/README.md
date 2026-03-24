@@ -2,7 +2,11 @@
 
 End-to-end AI subsystem for civic complaint intelligence:
 - Multilingual complaint understanding (English, Malayalam, Hindi, mixed)
+<<<<<<< HEAD
 - Voice-to-text support (browser mic + optional Gemini audio transcription)
+=======
+- Voice-to-text support (browser mic recording + Gemini audio transcription)
+>>>>>>> Ai_Model
 - Structured complaint extraction
 - Intent classification
 - Scam signal detection
@@ -143,8 +147,13 @@ Response shape:
 ### POST /transcribe
 
 - Multipart form with `audio` file
+<<<<<<< HEAD
 - Uses Gemini API if `GEMINI_API_KEY` is configured
 - If key is missing, returns clear error message and frontend mic still works via browser speech recognition
+=======
+- Uses Gemini audio transcription if `GEMINI_API_KEY` is configured
+- Frontend fills the textarea with the transcription for you to edit before analysis
+>>>>>>> Ai_Model
 
 ### POST /generate-report
 
