@@ -1,0 +1,81 @@
+Country,Year,Gender,Age Group,"Unrecovered Victims Of Kidnapping And Abduction From Previous Years (UOM:Number), Scaling Factor:1","Victims Kidnapped And Abducted During The Year (UOM:Number), Scaling Factor:1","All Kidnapped And Abducted (UOM:Number), Scaling Factor:1","Victims Recovered Alive (UOM:Number), Scaling Factor:1","Victims Recovered Dead (UOM:Number), Scaling Factor:1","Recovered Dead  And Alive (UOM:Number), Scaling Factor:1","Percentage Recovery (UOM:%(Percentage)), Scaling Factor:1","Unrecovered Kidnapped And Abducted Persons (UOM:Number), Scaling Factor:1"
+India,"Calendar Year (Jan - Dec), 2022",Female,12 Years to 16 Years,14180,21451,35631,21351,152,21503,60.3,14128
+India,"Calendar Year (Jan - Dec), 2022",Male,12 Years to 16 Years,3940,5814,9754,5587,81,5668,58.1,4086
+India,"Calendar Year (Jan - Dec), 2022",Total,12 Years to 16 Years,18120,27265,45385,26938,233,27171,118.4,18214
+India,"Calendar Year (Jan - Dec), 2022",Transgender,12 Years to 16 Years,0,0,0,0,0,0,,0
+India,"Calendar Year (Jan - Dec), 2022",Female,16 Years to 18 Years,22217,37429,59646,39033,407,39440,66.1,20206
+India,"Calendar Year (Jan - Dec), 2022",Male,16 Years to 18 Years,4031,5777,9808,5356,112,5468,55.8,4340
+India,"Calendar Year (Jan - Dec), 2022",Total,16 Years to 18 Years,26248,43206,69454,44389,519,44908,121.89999999999999,24546
+India,"Calendar Year (Jan - Dec), 2022",Transgender,16 Years to 18 Years,0,0,0,0,0,0,,0
+India,"Calendar Year (Jan - Dec), 2022",Female,6 Years to 12 Years,3077,2807,5884,2656,21,2677,45.5,3207
+India,"Calendar Year (Jan - Dec), 2022",Male,6 Years to 12 Years,2255,1942,4197,1884,45,1929,46.0,2268
+India,"Calendar Year (Jan - Dec), 2022",Total,6 Years to 12 Years,5332,4749,10081,4540,66,4606,91.5,5475
+India,"Calendar Year (Jan - Dec), 2022",Transgender,6 Years to 12 Years,0,0,0,0,0,0,,0
+India,"Calendar Year (Jan - Dec), 2022",Female,Below 6 Years,745,412,1157,473,10,483,41.7,674
+India,"Calendar Year (Jan - Dec), 2022",Male,Below 6 Years,655,437,1092,406,14,420,38.5,672
+India,"Calendar Year (Jan - Dec), 2022",Total,Below 6 Years,1400,849,2249,879,24,903,80.2,1346
+India,"Calendar Year (Jan - Dec), 2022",Transgender,Below 6 Years,0,0,0,0,0,0,,0
+India,"Calendar Year (Jan - Dec), 2021",Female,12 Years to 16 Years,13757,21389,35146,20787,179,20966,59.7,14180
+India,"Calendar Year (Jan - Dec), 2021",Male,12 Years to 16 Years,4178,4425,8603,4577,86,4663,54.2,3940
+India,"Calendar Year (Jan - Dec), 2021",Total,12 Years to 16 Years,17935,25814,43749,25364,265,25629,113.9,18120
+India,"Calendar Year (Jan - Dec), 2021",Transgender,12 Years to 16 Years,0,0,0,0,0,0,,0
+India,"Calendar Year (Jan - Dec), 2021",Female,16 Years to 18 Years,21263,33731,54994,32593,184,32777,59.6,22217
+India,"Calendar Year (Jan - Dec), 2021",Male,16 Years to 18 Years,4051,4402,8453,4317,105,4422,52.3,4031
+India,"Calendar Year (Jan - Dec), 2021",Total,16 Years to 18 Years,25314,38133,63447,36910,289,37199,111.9,26248
+India,"Calendar Year (Jan - Dec), 2021",Transgender,16 Years to 18 Years,0,0,0,0,0,0,,0
+India,"Calendar Year (Jan - Dec), 2021",Female,6 Years to 12 Years,3325,2454,5779,2667,35,2702,46.8,3077
+India,"Calendar Year (Jan - Dec), 2021",Male,6 Years to 12 Years,2350,1711,4061,1772,34,1806,44.5,2255
+India,"Calendar Year (Jan - Dec), 2021",Total,6 Years to 12 Years,5675,4165,9840,4439,69,4508,91.3,5332
+India,"Calendar Year (Jan - Dec), 2021",Transgender,6 Years to 12 Years,0,0,0,0,0,0,,0
+India,"Calendar Year (Jan - Dec), 2021",Female,Below 6 Years,742,484,1226,472,9,481,39.2,745
+India,"Calendar Year (Jan - Dec), 2021",Male,Below 6 Years,679,418,1097,423,19,442,40.3,655
+India,"Calendar Year (Jan - Dec), 2021",Total,Below 6 Years,1421,902,2323,895,28,923,79.5,1400
+India,"Calendar Year (Jan - Dec), 2021",Transgender,Below 6 Years,0,0,0,0,0,0,,0
+India,"Calendar Year (Jan - Dec), 2019",Female,12 Years to 16 Years,9656,19355,29011,15892,140,16032,55.3,12979
+India,"Calendar Year (Jan - Dec), 2019",Male,12 Years to 16 Years,3994,6823,10817,6386,125,6511,60.2,4306
+India,"Calendar Year (Jan - Dec), 2019",Total,12 Years to 16 Years,13650,26178,39828,22278,265,22543,115.5,17285
+India,"Calendar Year (Jan - Dec), 2019",Female,16 Years to 18 Years,15656,31716,47372,27826,180,28006,59.1,19366
+India,"Calendar Year (Jan - Dec), 2019",Male,16 Years to 18 Years,4030,5925,9955,5504,74,5578,56.0,4377
+India,"Calendar Year (Jan - Dec), 2019",Total,16 Years to 18 Years,19686,37641,57327,33330,254,33584,115.1,23743
+India,"Calendar Year (Jan - Dec), 2019",Female,6 Years to 12 Years,2452,3724,6176,2873,18,2891,46.8,3285
+India,"Calendar Year (Jan - Dec), 2019",Male,6 Years to 12 Years,2299,2576,4875,2458,39,2497,51.2,2378
+India,"Calendar Year (Jan - Dec), 2019",Total,6 Years to 12 Years,4751,6300,11051,5331,57,5388,98.0,5663
+India,"Calendar Year (Jan - Dec), 2019",Female,Below 6 Years,710,575,1285,565,6,571,44.4,714
+India,"Calendar Year (Jan - Dec), 2019",Male,Below 6 Years,649,570,1219,543,11,554,45.4,665
+India,"Calendar Year (Jan - Dec), 2019",Total,Below 6 Years,1359,1145,2504,1108,17,1125,89.8,1379
+India,"Calendar Year (Jan - Dec), 2018",Female,12 Years to 16 Years,8598,17411,26009,15763,37,15800,60.7,10209
+India,"Calendar Year (Jan - Dec), 2018",Male,12 Years to 16 Years,3718,6795,10513,6381,73,6454,61.4,4059
+India,"Calendar Year (Jan - Dec), 2018",Total,12 Years to 16 Years,12316,24206,36522,22144,110,22254,122.1,14268
+India,"Calendar Year (Jan - Dec), 2018",Female,16 Years to 18 Years,14164,27204,41368,24436,53,24489,59.2,16879
+India,"Calendar Year (Jan - Dec), 2018",Male,16 Years to 18 Years,3633,5217,8850,4807,16,4823,54.5,4027
+India,"Calendar Year (Jan - Dec), 2018",Total,16 Years to 18 Years,17797,32421,50218,29243,69,29312,113.7,20906
+India,"Calendar Year (Jan - Dec), 2018",Female,6 Years to 12 Years,2121,2927,5048,2556,29,2585,51.2,2463
+India,"Calendar Year (Jan - Dec), 2018",Male,6 Years to 12 Years,1955,2689,4644,2492,48,2540,54.7,2104
+India,"Calendar Year (Jan - Dec), 2018",Total,6 Years to 12 Years,4076,5616,9692,5048,77,5125,105.9,4567
+India,"Calendar Year (Jan - Dec), 2018",Female,Below 6 Years,855,564,1419,667,9,676,47.6,743
+India,"Calendar Year (Jan - Dec), 2018",Male,Below 6 Years,681,549,1230,576,19,595,48.4,635
+India,"Calendar Year (Jan - Dec), 2018",Total,Below 6 Years,1536,1113,2649,1243,28,1271,96.0,1378
+India,"Calendar Year (Jan - Dec), 2017",Female,12 Years to 16 Years,9288,14978,24266,15382,157,15539,64.0,8727
+India,"Calendar Year (Jan - Dec), 2017",Male,12 Years to 16 Years,4307,6156,10463,6732,69,6801,65.0,3662
+India,"Calendar Year (Jan - Dec), 2017",Total,12 Years to 16 Years,13595,21134,34729,22114,226,22340,129.0,12389
+India,"Calendar Year (Jan - Dec), 2017",Female,16 Years to 18 Years,13676,23864,37540,23065,209,23274,62.0,14266
+India,"Calendar Year (Jan - Dec), 2017",Male,16 Years to 18 Years,3184,4955,8139,4363,60,4423,54.3,3716
+India,"Calendar Year (Jan - Dec), 2017",Total,16 Years to 18 Years,16860,28819,45679,27428,269,27697,116.3,17982
+India,"Calendar Year (Jan - Dec), 2017",Female,6 Years to 12 Years,1943,2819,4762,2432,18,2450,51.4,2312
+India,"Calendar Year (Jan - Dec), 2017",Male,6 Years to 12 Years,2067,2593,4660,2682,37,2719,58.3,1941
+India,"Calendar Year (Jan - Dec), 2017",Total,6 Years to 12 Years,4010,5412,9422,5114,55,5169,109.69999999999999,4253
+India,"Calendar Year (Jan - Dec), 2017",Female,Below 6 Years,897,665,1562,694,18,712,45.6,850
+India,"Calendar Year (Jan - Dec), 2017",Male,Below 6 Years,842,592,1434,695,16,711,49.6,723
+India,"Calendar Year (Jan - Dec), 2017",Total,Below 6 Years,1739,1257,2996,1389,34,1423,95.2,1573
+India,"Calendar Year (Jan - Dec), 2016",Female,12 Years to 16 Years,7368,15499,22867,12506,64,12570,55.0,10297
+India,"Calendar Year (Jan - Dec), 2016",Male,12 Years to 16 Years,3746,6225,9971,4976,44,5020,50.3,4951
+India,"Calendar Year (Jan - Dec), 2016",Total,12 Years to 16 Years,11114,21724,32838,17482,108,17590,105.3,15248
+India,"Calendar Year (Jan - Dec), 2016",Female,16 Years to 18 Years,11742,20838,32580,16532,42,16574,50.9,16006
+India,"Calendar Year (Jan - Dec), 2016",Male,16 Years to 18 Years,2941,4623,7564,3445,28,3473,45.9,4091
+India,"Calendar Year (Jan - Dec), 2016",Total,16 Years to 18 Years,14683,25461,40144,19977,70,20047,96.8,20097
+India,"Calendar Year (Jan - Dec), 2016",Female,6 Years to 12 Years,1306,2491,3797,1947,8,1955,51.5,1842
+India,"Calendar Year (Jan - Dec), 2016",Male,6 Years to 12 Years,1957,2756,4713,2321,32,2353,49.9,2360
+India,"Calendar Year (Jan - Dec), 2016",Total,6 Years to 12 Years,3263,5247,8510,4268,40,4308,101.4,4202
+India,"Calendar Year (Jan - Dec), 2016",Female,Below 6 Years,827,1014,1841,663,2,665,36.1,1176
+India,"Calendar Year (Jan - Dec), 2016",Male,Below 6 Years,885,882,1767,673,18,691,39.1,1076
+India,"Calendar Year (Jan - Dec), 2016",Total,Below 6 Years,1712,1896,3608,1336,20,1356,75.2,2252

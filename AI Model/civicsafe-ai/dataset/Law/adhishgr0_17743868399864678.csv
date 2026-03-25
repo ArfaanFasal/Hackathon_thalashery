@@ -1,0 +1,250 @@
+Country,State,Year,"Cognizable Crimes Reported By Ipc (UOM:Number), Scaling Factor:1","Registered Murder Cases (UOM:Number), Scaling Factor:1","Registered Cases Of Offence Against State (UOM:Number), Scaling Factor:1","Cases Reported Under The Prevention Of Corruption Act And Related Sections Of Ipc (UOM:Number), Scaling Factor:1","Value Of Property Stolen (UOM:INR(IndianRupees)), Scaling Factor:10000000","Value Of Property Recovered (UOM:INR(IndianRupees)), Scaling Factor:10000000","Cases Registered By Railway Protection Force (UOM:Number), Scaling Factor:1","Registered Cases Of Crime Or Atrocities Against Scheduled Castes (Scs) (UOM:Number), Scaling Factor:1","Registered Cases Of Crime Or Atrocities Against Scheduled Tribes (Sts) (UOM:Number), Scaling Factor:1","Cognizable Crimes Registered Under Sll (Special & Local Laws) (UOM:Number), Scaling Factor:1","Cognizable Crimes Registered Under Ipc (Indian Penal Code) And Sll (Special & Local Laws) (UOM:Number), Scaling Factor:1","Cases Registered Under Crime Against Women (Including Both Ipc And Sll (Special & Local Laws Crimes) (UOM:Number), Scaling Factor:1","Cases Of Crime Against Foreigners (UOM:Number), Scaling Factor:1","Registered Cyber-Crime Cases (UOM:Number), Scaling Factor:1","Cases Registered Under Economic Offences (UOM:Number), Scaling Factor:1","Cases Registered Under Environment Related Offences (UOM:Number), Scaling Factor:1","Cases Registered Under Ipc And Sll (Special & Local Laws) In Which Juveniles Were Apprehended (UOM:Number), Scaling Factor:1"
+India,Andaman and Nicobar Islands,"Calendar Year (Jan - Dec), 2022",460,7,,,,,,,,1129,1589,178,,,,,
+India,Andhra Pradesh,"Calendar Year (Jan - Dec), 2022",158547,925,,,,,,,,36737,195284,25503,,,,,
+India,Arunachal Pradesh,"Calendar Year (Jan - Dec), 2022",2308,56,,,,,,,,453,2761,335,,,,,
+India,Assam,"Calendar Year (Jan - Dec), 2022",59315,1072,,,,,,,,9622,68937,14148,,,,,
+India,Bihar,"Calendar Year (Jan - Dec), 2022",211079,2930,,,,,,,,136756,347835,20222,,,,,
+India,Chandigarh,"Calendar Year (Jan - Dec), 2022",2941,18,,,,,,,,717,3658,325,,,,,
+India,Chhattisgarh,"Calendar Year (Jan - Dec), 2022",73822,1013,,,,,,,,47243,121065,8693,,,,,
+India,Delhi,"Calendar Year (Jan - Dec), 2022",300429,509,,,,,,,,19845,320274,14247,,,,,
+India,Goa,"Calendar Year (Jan - Dec), 2022",2711,44,,,,,,,,968,3679,273,,,,,
+India,Gujarat,"Calendar Year (Jan - Dec), 2022",134600,959,,,,,,,,389503,524103,7731,,,,,
+India,Haryana,"Calendar Year (Jan - Dec), 2022",125435,1020,,,,,,,,117414,242849,16743,,,,,
+India,Himachal Pradesh,"Calendar Year (Jan - Dec), 2022",13231,85,,,,,,,,5822,19053,1551,,,,,
+India,Jammu and Kashmir,"Calendar Year (Jan - Dec), 2022",25915,99,,,,,,,,4282,30197,3716,,,,,
+India,Jharkhand,"Calendar Year (Jan - Dec), 2022",48726,1550,,,,,,,,15633,64359,7678,,,,,
+India,Karnataka,"Calendar Year (Jan - Dec), 2022",129461,1404,,,,,,,,51281,180742,17813,,,,,
+India,Kerala,"Calendar Year (Jan - Dec), 2022",235858,334,,,,,,,,218978,454836,15213,,,,,
+India,Ladakh,"Calendar Year (Jan - Dec), 2022",439,5,,,,,,,,39,478,15,,,,,
+India,Lakshadweep,"Calendar Year (Jan - Dec), 2022",64,0,,,,,,,,33,97,16,,,,,
+India,Madhya Pradesh,"Calendar Year (Jan - Dec), 2022",298578,1978,,,,,,,,190388,488966,32765,,,,,
+India,Maharashtra,"Calendar Year (Jan - Dec), 2022",374038,2295,,,,,,,,182974,557012,45331,,,,,
+India,Manipur,"Calendar Year (Jan - Dec), 2022",3029,47,,,,,,,,885,3914,248,,,,,
+India,Meghalaya,"Calendar Year (Jan - Dec), 2022",2914,72,,,,,,,,711,3625,690,,,,,
+India,Mizoram,"Calendar Year (Jan - Dec), 2022",3587,31,,,,,,,,546,4133,147,,,,,
+India,Nagaland,"Calendar Year (Jan - Dec), 2022",1008,21,,,,,,,,584,1592,49,,,,,
+India,Odisha,"Calendar Year (Jan - Dec), 2022",143414,1379,,,,,,,,34776,178190,23648,,,,,
+India,Puducherry,"Calendar Year (Jan - Dec), 2022",3237,30,,,,,,,,1321,4558,200,,,,,
+India,Punjab,"Calendar Year (Jan - Dec), 2022",43738,670,,,,,,,,29887,73625,5572,,,,,
+India,Rajasthan,"Calendar Year (Jan - Dec), 2022",236090,1834,,,,,,,,76714,312804,45058,,,,,
+India,Sikkim,"Calendar Year (Jan - Dec), 2022",549,9,,,,,,,,270,819,179,,,,,
+India,Tamil Nadu,"Calendar Year (Jan - Dec), 2022",193913,1690,,,,,,,,279543,473456,9207,,,,,
+India,Telangana,"Calendar Year (Jan - Dec), 2022",151849,937,,,,,,,,13981,165830,22066,,,,,
+India,Tripura,"Calendar Year (Jan - Dec), 2022",3653,109,,,,,,,,879,4532,752,,,,,
+India,Uttar Pradesh,"Calendar Year (Jan - Dec), 2022",401787,3491,,,,,,,,351888,753675,65743,,,,,
+India,Uttarakhand,"Calendar Year (Jan - Dec), 2022",16967,187,,,,,,,,17640,34607,4337,,,,,
+India,West Bengal,"Calendar Year (Jan - Dec), 2022",156503,1696,,,,,,,,24036,180539,34738,,,,,
+India,Andaman and Nicobar Islands,"Calendar Year (Jan - Dec), 2021",386,16,,,,,,,,946,1332,169,,,,,
+India,Andhra Pradesh,"Calendar Year (Jan - Dec), 2021",179611,956,,,,,,,,42588,222199,17752,,,,,
+India,Arunachal Pradesh,"Calendar Year (Jan - Dec), 2021",2626,49,,,,,,,,413,3039,366,,,,,
+India,Assam,"Calendar Year (Jan - Dec), 2021",119883,1192,,,,,,,,13356,133239,29046,,,,,
+India,Bihar,"Calendar Year (Jan - Dec), 2021",186006,2799,,,,,,,,96077,282083,17950,,,,,
+India,Chandigarh,"Calendar Year (Jan - Dec), 2021",2401,17,,,,,,,,594,2995,343,,,,,
+India,Chhattisgarh,"Calendar Year (Jan - Dec), 2021",70519,1007,,,,,,,,40114,110633,7344,,,,,
+India,Delhi,"Calendar Year (Jan - Dec), 2021",291904,459,,,,,,,,14485,306389,14277,,,,,
+India,Goa,"Calendar Year (Jan - Dec), 2021",2099,26,,,,,,,,892,2991,224,,,,,
+India,Gujarat,"Calendar Year (Jan - Dec), 2021",273056,1010,,,,,,,,458682,731738,7348,,,,,
+India,Haryana,"Calendar Year (Jan - Dec), 2021",112720,1112,,,,,,,,93711,206431,16658,,,,,
+India,Himachal Pradesh,"Calendar Year (Jan - Dec), 2021",13041,86,,,,,,,,5792,18833,1599,,,,,
+India,Jammu and Kashmir,"Calendar Year (Jan - Dec), 2021",27447,136,,,,,,,,4228,31675,3937,,,,,
+India,Jharkhand,"Calendar Year (Jan - Dec), 2021",47684,1573,,,,,,,,13081,60765,8110,,,,,
+India,Karnataka,"Calendar Year (Jan - Dec), 2021",115728,1357,,,,,,,,47969,163697,14468,,,,,
+India,Kerala,"Calendar Year (Jan - Dec), 2021",142643,337,,,,,,,,382317,524960,13539,,,,,
+India,Ladakh,"Calendar Year (Jan - Dec), 2021",519,5,,,,,,,,40,559,18,,,,,
+India,Lakshadweep,"Calendar Year (Jan - Dec), 2021",89,1,,,,,,,,39,128,9,,,,,
+India,Madhya Pradesh,"Calendar Year (Jan - Dec), 2021",304066,2034,,,,,,,,171852,475918,30673,,,,,
+India,Maharashtra,"Calendar Year (Jan - Dec), 2021",367218,2330,,,,,,,,173582,540800,39526,,,,,
+India,Manipur,"Calendar Year (Jan - Dec), 2021",2484,46,,,,,,,,720,3204,302,,,,,
+India,Meghalaya,"Calendar Year (Jan - Dec), 2021",2672,80,,,,,,,,756,3428,685,,,,,
+India,Mizoram,"Calendar Year (Jan - Dec), 2021",2467,24,,,,,,,,729,3196,176,,,,,
+India,Nagaland,"Calendar Year (Jan - Dec), 2021",1033,27,,,,,,,,445,1478,54,,,,,
+India,Odisha,"Calendar Year (Jan - Dec), 2021",124956,1394,,,,,,,,30464,155420,31352,,,,,
+India,Puducherry,"Calendar Year (Jan - Dec), 2021",3851,19,,,,,,,,744,4595,153,,,,,
+India,Punjab,"Calendar Year (Jan - Dec), 2021",46454,723,,,,,,,,27127,73581,5662,,,,,
+India,Rajasthan,"Calendar Year (Jan - Dec), 2021",214552,1786,,,,,,,,70017,284569,40738,,,,,
+India,Sikkim,"Calendar Year (Jan - Dec), 2021",532,14,,,,,,,,196,728,130,,,,,
+India,Tamil Nadu,"Calendar Year (Jan - Dec), 2021",322852,1686,,,,,,,,433901,756753,8501,,,,,
+India,Telangana,"Calendar Year (Jan - Dec), 2021",146131,1026,,,,,,,,12678,158809,20865,,,,,
+India,Tripura,"Calendar Year (Jan - Dec), 2021",4133,122,,,,,,,,655,4788,807,,,,,
+India,Uttar Pradesh,"Calendar Year (Jan - Dec), 2021",357905,3717,,,,,,,,250177,608082,56083,,,,,
+India,Uttarakhand,"Calendar Year (Jan - Dec), 2021",15704,208,,,,,,,,19171,34875,3431,,,,,
+India,West Bengal,"Calendar Year (Jan - Dec), 2021",157498,1884,,,,,,,,24323,181821,35884,,,,,
+India,Andaman and Nicobar Islands,"Calendar Year (Jan - Dec), 2020",482,5,,,,,,,,2060,2542,143,,,,,
+India,Andhra Pradesh,"Calendar Year (Jan - Dec), 2020",188997,853,,,,,,,,49108,238105,17089,,,,,
+India,Arunachal Pradesh,"Calendar Year (Jan - Dec), 2020",2244,45,,,,,,,,259,2503,281,,,,,
+India,Assam,"Calendar Year (Jan - Dec), 2020",111558,1131,,,,,,,,10051,121609,26352,,,,,
+India,Bihar,"Calendar Year (Jan - Dec), 2020",194698,3150,,,,,,,,62814,257512,15359,,,,,
+India,Chandigarh,"Calendar Year (Jan - Dec), 2020",2583,22,,,,,,,,671,3254,301,,,,,
+India,Chhattisgarh,"Calendar Year (Jan - Dec), 2020",65216,972,,,,,,,,37957,103173,7385,,,,,
+India,Delhi,"Calendar Year (Jan - Dec), 2020",249192,472,,,,,,,,16878,266070,10093,,,,,
+India,Goa,"Calendar Year (Jan - Dec), 2020",3393,34,,,,,,,,973,4366,219,,,,,
+India,Gujarat,"Calendar Year (Jan - Dec), 2020",381849,982,,,,,,,,317770,699619,8028,,,,,
+India,Haryana,"Calendar Year (Jan - Dec), 2020",103276,1143,,,,,,,,89119,192395,13000,,,,,
+India,Himachal Pradesh,"Calendar Year (Jan - Dec), 2020",14803,91,,,,,,,,5827,20630,1614,,,,,
+India,Jammu and Kashmir,"Calendar Year (Jan - Dec), 2020",25233,149,,,,,,,,3678,28911,3405,,,,,
+India,Jharkhand,"Calendar Year (Jan - Dec), 2020",51033,1592,,,,,,,,12537,63570,7630,,,,,
+India,Karnataka,"Calendar Year (Jan - Dec), 2020",106350,1331,,,,,,,,43730,150080,12680,,,,,
+India,Kerala,"Calendar Year (Jan - Dec), 2020",149099,306,,,,,,,,405625,554724,10139,,,,,
+India,Ladakh,"Calendar Year (Jan - Dec), 2020",387,0,,,,,,,,16,403,9,,,,,
+India,Lakshadweep,"Calendar Year (Jan - Dec), 2020",107,0,,,,,,,,40,147,15,,,,,
+India,Madhya Pradesh,"Calendar Year (Jan - Dec), 2020",283881,2101,,,,,,,,144165,428046,25640,,,,,
+India,Maharashtra,"Calendar Year (Jan - Dec), 2020",394017,2163,,,,,,,,144986,539003,31954,,,,,
+India,Manipur,"Calendar Year (Jan - Dec), 2020",2349,46,,,,,,,,637,2986,247,,,,,
+India,Meghalaya,"Calendar Year (Jan - Dec), 2020",2871,79,,,,,,,,873,3744,568,,,,,
+India,Mizoram,"Calendar Year (Jan - Dec), 2020",1787,28,,,,,,,,502,2289,172,,,,,
+India,Nagaland,"Calendar Year (Jan - Dec), 2020",1022,25,,,,,,,,489,1511,39,,,,,
+India,Odisha,"Calendar Year (Jan - Dec), 2020",108533,1470,,,,,,,,25697,134230,25489,,,,,
+India,Puducherry,"Calendar Year (Jan - Dec), 2020",6725,39,,,,,,,,1215,7940,113,,,,,
+India,Punjab,"Calendar Year (Jan - Dec), 2020",49870,757,,,,,,,,33005,82875,4838,,,,,
+India,Rajasthan,"Calendar Year (Jan - Dec), 2020",193279,1719,,,,,,,,67099,260378,34535,,,,,
+India,Sikkim,"Calendar Year (Jan - Dec), 2020",504,11,,,,,,,,171,675,140,,,,,
+India,Tamil Nadu,"Calendar Year (Jan - Dec), 2020",891700,1661,,,,,,,,485981,1377681,6630,,,,,
+India,Telangana,"Calendar Year (Jan - Dec), 2020",135885,802,,,,,,,,11619,147504,17791,,,,,
+India,Tripura,"Calendar Year (Jan - Dec), 2020",4010,114,,,,,,,,643,4653,874,,,,,
+India,Uttar Pradesh,"Calendar Year (Jan - Dec), 2020",355110,3779,,,,,,,,302815,657925,49385,,,,,
+India,Uttarakhand,"Calendar Year (Jan - Dec), 2020",13812,160,,,,,,,,43520,57332,2846,,,,,
+India,West Bengal,"Calendar Year (Jan - Dec), 2020",158060,1948,,,,,,,,24307,182367,36439,,,,,
+India,Andaman and Nicobar Islands,"Calendar Year (Jan - Dec), 2019",564,13,,,,,,,,3470,4034,135,,,,,
+India,Andhra Pradesh,"Calendar Year (Jan - Dec), 2019",119229,870,,,,,,,,26522,145751,17746,,,,,
+India,Arunachal Pradesh,"Calendar Year (Jan - Dec), 2019",2590,60,,,,,,,,287,2877,317,,,,,
+India,Assam,"Calendar Year (Jan - Dec), 2019",123512,1235,,,,,,,,9271,132783,30025,,,,,
+India,Bihar,"Calendar Year (Jan - Dec), 2019",197935,3138,,,,,,,,71174,269109,18587,,,,,
+India,Chandigarh,"Calendar Year (Jan - Dec), 2019",2819,26,,,,,,,,1699,4518,515,,,,,
+India,Chhattisgarh,"Calendar Year (Jan - Dec), 2019",61256,913,,,,,,,,35305,96561,7689,,,,,
+India,Delhi,"Calendar Year (Jan - Dec), 2019",299475,521,,,,,,,,16786,316261,,,,,,
+India,Goa,"Calendar Year (Jan - Dec), 2019",2465,33,,,,,,,,1262,3727,329,,,,,
+India,Gujarat,"Calendar Year (Jan - Dec), 2019",139503,993,,,,,,,,291563,431066,8799,,,,,
+India,Haryana,"Calendar Year (Jan - Dec), 2019",111323,1137,,,,,,,,55013,166336,14683,,,,,
+India,Himachal Pradesh,"Calendar Year (Jan - Dec), 2019",14480,70,,,,,,,,5444,19924,1636,,,,,
+India,Jammu and Kashmir,"Calendar Year (Jan - Dec), 2019",21913.95417253854707393640,116.39709634583498936790,,,,,,,,2938.29308758729670639640,24852.24726012584378033280,3001.87133349048388546290,,,,,
+India,Jharkhand,"Calendar Year (Jan - Dec), 2019",50048,1626,,,,,,,,12158,62206,8760,,,,,
+India,Karnataka,"Calendar Year (Jan - Dec), 2019",120165,1314,,,,,,,,43526,163691,13828,,,,,
+India,Kerala,"Calendar Year (Jan - Dec), 2019",175810,323,,,,,,,,277273,453083,11462,,,,,
+India,Ladakh,"Calendar Year (Jan - Dec), 2019",490.04582746145292606360,2.60290365416501063210,,,,,,,,65.70691241270329360360,555.75273987415621966720,67.12866650951611453710,,,,,
+India,Lakshadweep,"Calendar Year (Jan - Dec), 2019",123,0,,,,,,,,59,182,38,,,,,
+India,Madhya Pradesh,"Calendar Year (Jan - Dec), 2019",246470,1795,,,,,,,,149149,395619,27560,,,,,
+India,Maharashtra,"Calendar Year (Jan - Dec), 2019",341084,2142,,,,,,,,168349,509433,37144,,,,,
+India,Manipur,"Calendar Year (Jan - Dec), 2019",2830,56,,,,,,,,831,3661,266,,,,,
+India,Meghalaya,"Calendar Year (Jan - Dec), 2019",3125,68,,,,,,,,772,3897,558,,,,,
+India,Mizoram,"Calendar Year (Jan - Dec), 2019",2379,22,,,,,,,,501,2880,170,,,,,
+India,Nagaland,"Calendar Year (Jan - Dec), 2019",1117,25,,,,,,,,544,1661,43,,,,,
+India,Odisha,"Calendar Year (Jan - Dec), 2019",96033,1356,,,,,,,,25492,121525,23183,,,,,
+India,Puducherry,"Calendar Year (Jan - Dec), 2019",3167,29,,,,,,,,837,4004,95,,,,,
+India,Punjab,"Calendar Year (Jan - Dec), 2019",44697,679,,,,,,,,28158,72855,5886,,,,,
+India,Rajasthan,"Calendar Year (Jan - Dec), 2019",225306,1659,,,,,,,,79088,304394,41550,,,,,
+India,Sikkim,"Calendar Year (Jan - Dec), 2019",632,17,,,,,,,,189,821,125,,,,,
+India,Tamil Nadu,"Calendar Year (Jan - Dec), 2019",168116,1745,,,,,,,,286978,455094,5934,,,,,
+India,Telangana,"Calendar Year (Jan - Dec), 2019",118338,839,,,,,,,,12916,131254,18394,,,,,
+India,The Dadra and Nagar Haveli and Daman and Diu,"Calendar Year (Jan - Dec), 2019",548.00000000000000000000,13.00000000000000000000,,,,,,,,112.00000000000000000000,660.00000000000000000000,82.00000000000000000000,,,,,
+India,Tripura,"Calendar Year (Jan - Dec), 2019",5336,144,,,,,,,,652,5988,1070,,,,,
+India,Uttar Pradesh,"Calendar Year (Jan - Dec), 2019",353131,3806,,,,,,,,275447,628578,59853,,,,,
+India,Uttarakhand,"Calendar Year (Jan - Dec), 2019",12081,199,,,,,,,,16187,28268,2541,,,,,
+India,West Bengal,"Calendar Year (Jan - Dec), 2019",157610,1933,,,,,,,,30453,188063,30394,,,,,
+India,Andaman and Nicobar Islands,"Calendar Year (Jan - Dec), 2018",706,11,3,1,1.1096867,0.599067,0,0,1,2993,3699,147,3,7,37,0,25
+India,Andhra Pradesh,"Calendar Year (Jan - Dec), 2018",126635,935,173,151,112.3250786,49.8332477,74654,1836,330,18068,144703,16438,3,1207,6473,91,966
+India,Arunachal Pradesh,"Calendar Year (Jan - Dec), 2018",2613,62,9,18,11.373719,2.2370184,0,0,0,204,2817,368,0,7,122,2,31
+India,Assam,"Calendar Year (Jan - Dec), 2018",112232,1241,578,25,110.1841057,24.1374176,8698,8,6,8340,120572,27728,7,2022,8826,94,150
+India,Bihar,"Calendar Year (Jan - Dec), 2018",196911,2934,62,69,119.2091809,22.219691,41400,7061,64,65904,262815,16920,0,374,9209,152,671
+India,Chandigarh,"Calendar Year (Jan - Dec), 2018",3072,20,1,3,9.8999295,3.5143653,1124,1,0,2895,5967,442,2,30,205,0,137
+India,Chhattisgarh,"Calendar Year (Jan - Dec), 2018",60178,917,18,27,53.0315023,17.6909347,23987,264,388,38055,98233,8587,0,139,1871,54,1911
+India,Delhi,"Calendar Year (Jan - Dec), 2018",249012,513,11,6,1017.663242,61.8092238,24432,36,0,13600,262612,13640,189,189,4918,17,2727
+India,Goa,"Calendar Year (Jan - Dec), 2018",2740,29,22,11,8.5523679,2.8907685,464,5,5,1144,3884,362,34,29,215,5,20
+India,Gujarat,"Calendar Year (Jan - Dec), 2018",147574,1072,42,333,311.6975968,80.6461043,74214,1426,311,245620,393194,8329,3,702,4049,102,2040
+India,Haryana,"Calendar Year (Jan - Dec), 2018",108212,1104,418,107,230.0743929,65.8951568,14950,961,0,83017,191229,14326,8,418,5744,37,1178
+India,Himachal Pradesh,"Calendar Year (Jan - Dec), 2018",14604,99,81,28,17.9433154,6.9744091,323,130,1,4990,19594,1633,8,69,600,270,232
+India,Jammu and Kashmir,"Calendar Year (Jan - Dec), 2018",23686.32004294739581960560,177.04096166887506786210,274.85364767377842027210,82.16265624411881602440,32.670336513285534791265409950,10.866871550858126544211345950,2602.79557459047820763010,0.97812686004903352410,0.00000000000000000000,2993.06819175004258374600,26679.38823469743840335160,3361.82201798852822233170,0.00000000000000000000,71.40326078357944725930,684.68880203432346687000,7.82501488039226819280,278.76615511397455436850
+India,Jharkhand,"Calendar Year (Jan - Dec), 2018",45287,1712,191,90,36.9524726,3.3581224,25715,537,224,10377,55664,7083,0,930,4186,155,79
+India,Karnataka,"Calendar Year (Jan - Dec), 2018",126534,1334,112,378,244.7861671,97.2726557,34396,1325,322,36882,163416,13514,28,5839,7215,400,528
+India,Kerala,"Calendar Year (Jan - Dec), 2018",186958,292,341,142,66.5384875,23.4171778,28458,887,138,325209,512167,10461,10,340,5522,5750,475
+India,Ladakh,"Calendar Year (Jan - Dec), 2018",529.67995705260418039440,3.95903833112493213790,6.14635232622157972790,1.83734375588118397560,0.730582986714465208734590050,0.243007949141873455788654050,58.20442540952179236990,0.02187313995096647590,0.00000000000000000000,66.93180824995741625400,596.61176530256159664840,75.17798201147177766830,0.00000000000000000000,1.59673921642055274070,15.31119796567653313000,0.17498511960773180720,6.23384488602544563150
+India,Lakshadweep,"Calendar Year (Jan - Dec), 2018",48,1,4,0,0.0047,0,0,0,0,29,77,11,0,4,0,1,0
+India,Madhya Pradesh,"Calendar Year (Jan - Dec), 2018",248354,1879,223,256,171.5216465,63.2015371,89036,4753,1868,156775,405129,28942,6,740,2955,139,5232
+India,Maharashtra,"Calendar Year (Jan - Dec), 2018",346291,2199,423,936,1403.388913,754.1719575,223289,1974,526,169383,515674,35497,63,3511,14854,1010,5880
+India,Manipur,"Calendar Year (Jan - Dec), 2018",2869,52,307,4,11.9940741,1.090442,0,0,1,912,3781,271,0,29,144,1,10
+India,Meghalaya,"Calendar Year (Jan - Dec), 2018",2921,95,22,1,12.3668622,1.3812276,0,0,0,561,3482,571,0,74,257,45,71
+India,Mizoram,"Calendar Year (Jan - Dec), 2018",1774,27,0,7,3.5943446,1.8425381,0,0,0,577,2351,249,1,6,69,1,31
+India,Nagaland,"Calendar Year (Jan - Dec), 2018",1223,31,12,16,7.4321362,1.5900537,214,0,0,552,1775,75,0,2,103,0,10
+India,Odisha,"Calendar Year (Jan - Dec), 2018",83769,1378,15,494,119.3392197,34.3524747,41897,1778,557,23639,107408,20274,0,843,3226,8,1078
+India,Puducherry,"Calendar Year (Jan - Dec), 2018",3606,29,13,0,4.9098899,1.7406835,295,7,0,1068,4674,166,0,14,68,63,10
+India,Punjab,"Calendar Year (Jan - Dec), 2018",41640,684,39,176,102.5439463,31.1491528,20967,168,0,28678,70318,5302,5,239,4835,35,236
+India,Rajasthan,"Calendar Year (Jan - Dec), 2018",171889,1508,125,372,247.2385618,119.4587436,66487,4607,1095,78657,250546,27866,21,1104,21309,9784,2068
+India,Sikkim,"Calendar Year (Jan - Dec), 2018",620,12,3,0,1.31837,0.29715,0,5,1,249,869,172,0,1,43,0,9
+India,Tamil Nadu,"Calendar Year (Jan - Dec), 2018",185912,1569,2241,264,144.1564249,96.5504381,79383,1413,15,313276,499188,5822,51,295,3865,14536,2304
+India,Telangana,"Calendar Year (Jan - Dec), 2018",113951,786,53,139,160.570656,113.3627941,16839,1507,419,12907,126858,16027,5,1205,10390,483,1408
+India,The Dadra and Nagar Haveli and Daman and Diu,"Calendar Year (Jan - Dec), 2018",574.00000000000000000000,12.00000000000000000000,1.00000000000000000000,2.00000000000000000000,6.705733900000000000000000000,2.003774300000000000000000000,0.00000000000000000000,1.00000000000000000000,3.00000000000000000000,75.00000000000000000000,649.00000000000000000000,54.00000000000000000000,0.00000000000000000000,0.00000000000000000000,53.00000000000000000000,2.00000000000000000000,15.00000000000000000000
+India,Tripura,"Calendar Year (Jan - Dec), 2018",5325,137,17,6,5.4135877,0.9776255,83,1,0,753,6078,907,0,20,173,0,44
+India,Uttar Pradesh,"Calendar Year (Jan - Dec), 2018",342355,4018,2503,84,324.4339257,94.1189138,140386,11924,145,242802,585157,59445,62,6280,22822,1693,1048
+India,Uttarakhand,"Calendar Year (Jan - Dec), 2018",14739,211,8,17,18.2205321,11.5187513,6225,58,7,19976,34715,2817,2,171,1528,194,179
+India,West Bengal,"Calendar Year (Jan - Dec), 2018",157610,1933,184,9,97.1373321,47.4827765,54107,119,101,30453,188063,30394,6,335,9682,64,503
+India,Andaman and Nicobar Islands,"Calendar Year (Jan - Dec), 2017",638,9,1,7,1.171352,0.5271764,0,0,2,2376,3014,132,0,3,40,2,16
+India,Andhra Pradesh,"Calendar Year (Jan - Dec), 2017",132336,1054,150,199,127.0091477,56.262036,76356,1969,341,15666,148002,17909,3,931,6299,135,1122
+India,Arunachal Pradesh,"Calendar Year (Jan - Dec), 2017",2565,79,16,11,20.4031238,1.9912572,0,2,0,181,2746,337,0,1,115,2,48
+India,Assam,"Calendar Year (Jan - Dec), 2017",104324,1144,323,27,108.3246274,14.8700988,6795,10,65,5628,109952,23082,2,1120,7363,105,192
+India,Bihar,"Calendar Year (Jan - Dec), 2017",180573,2803,146,128,158.3614969,44.4156112,60056,6747,80,55482,236055,14711,9,433,8067,51,1142
+India,Chandigarh,"Calendar Year (Jan - Dec), 2017",3240,25,3,2,8.2050288,2.7264362,1444,1,0,2222,5462,453,1,32,123,4,159
+India,Chhattisgarh,"Calendar Year (Jan - Dec), 2017",58481,919,14,27,50.2654788,15.3216177,22752,283,399,32035,90516,7996,1,171,1719,65,1952
+India,Delhi,"Calendar Year (Jan - Dec), 2017",232066,487,11,9,752.6885573,77.5788825,24747,48,4,12648,244714,13076,169,162,5200,21,2965
+India,Goa,"Calendar Year (Jan - Dec), 2017",2965,31,6,4,11.0178457,1.598277,383,10,2,978,3943,369,28,13,200,28,24
+India,Gujarat,"Calendar Year (Jan - Dec), 2017",128775,970,27,148,245.6410588,51.4941531,73690,1477,319,206024,334799,8133,4,458,3477,78,2013
+India,Haryana,"Calendar Year (Jan - Dec), 2017",97924,1046,2576,82,213.4200002,64.0436556,15478,762,0,126892,224816,11370,10,504,5923,42,1030
+India,Himachal Pradesh,"Calendar Year (Jan - Dec), 2017",13007,99,68,29,18.0202617,8.5105712,274,109,3,4789,17796,1246,4,56,574,196,184
+India,Jammu and Kashmir,"Calendar Year (Jan - Dec), 2017",22171.20153673144289077470,148.67528272745309566320,178.01908852892410138620,82.16265624411881602440,28.966029048386625764864534730,10.142927192298711195305231010,1108.21773243555498280530,0.00000000000000000000,0.00000000000000000000,2876.67109540420759437810,25047.87263213565048515280,3060.55894509342589690890,0.00000000000000000000,61.62199218308911201830,675.88566029388216515310,12.71564918063743581330,182.90972282916926900670
+India,Jharkhand,"Calendar Year (Jan - Dec), 2017",44595,1487,78,170,34.7385441,3.1909301,23157,541,237,8069,52664,5911,0,720,3510,158,75
+India,Karnataka,"Calendar Year (Jan - Dec), 2017",146354,1384,111,289,295.2527802,125.3063094,37873,1878,401,37709,184063,14078,30,3174,7604,494,499
+India,Kerala,"Calendar Year (Jan - Dec), 2017",235846,305,315,142,57.4834954,20.4184909,33109,916,144,417654,653500,11057,19,320,4678,6780,481
+India,Ladakh,"Calendar Year (Jan - Dec), 2017",495.79846326855710922530,3.32471727254690433680,3.98091147107589861380,1.83734375588118397560,0.647746251613374235135465270,0.226818907701288804694768990,24.78226756444501719470,0.00000000000000000000,0.00000000000000000000,64.32890459579240562190,560.12736786434951484720,68.44105490657410309110,0.00000000000000000000,1.37800781691088798170,15.11433970611783484690,0.28435081936256418670,4.09027717083073099330
+India,Lakshadweep,"Calendar Year (Jan - Dec), 2017",78,0,2,0,0.0338,0.00085,0,0,0,36,114,6,0,0,0,0,0
+India,Madhya Pradesh,"Calendar Year (Jan - Dec), 2017",269512,1908,32,294,163.7512053,65.4511509,91906,5892,2289,110170,379682,29788,5,490,3218,46,6491
+India,Maharashtra,"Calendar Year (Jan - Dec), 2017",288879,2103,253,925,1521.331323,207.7489073,234826,1689,464,178874,467753,31979,61,3604,13941,439,6026
+India,Manipur,"Calendar Year (Jan - Dec), 2017",3416,63,333,1,7.2095632,1.433081,0,0,1,834,4250,236,0,74,256,1,12
+India,Meghalaya,"Calendar Year (Jan - Dec), 2017",3521,87,38,1,8.8124516,1.2340167,0,0,0,431,3952,567,0,39,294,0,93
+India,Mizoram,"Calendar Year (Jan - Dec), 2017",2118,21,1,5,6.2012808,0.4521947,0,0,0,620,2738,301,1,10,91,1,21
+India,Nagaland,"Calendar Year (Jan - Dec), 2017",1068,36,14,12,4.9179199,1.2215873,87,0,0,485,1553,79,0,0,66,0,12
+India,Odisha,"Calendar Year (Jan - Dec), 2017",83583,1267,26,494,133.0793699,39.3702052,34621,1969,700,20283,103866,20098,0,824,3451,3,1111
+India,Puducherry,"Calendar Year (Jan - Dec), 2017",3883,25,7,2,6.142435,2.1422269,236,32,0,916,4799,147,0,5,92,75,104
+India,Punjab,"Calendar Year (Jan - Dec), 2017",39288,659,60,167,92.3338483,32.6889184,22420,118,0,31385,70673,4620,11,176,3788,35,215
+India,Rajasthan,"Calendar Year (Jan - Dec), 2017",169941,1473,74,404,237.4298518,125.1324264,73388,4238,984,75612,245553,25993,19,1304,21645,10122,2048
+India,Sikkim,"Calendar Year (Jan - Dec), 2017",719,13,0,0,1.5410468,0.36564,0,5,6,260,979,163,0,1,61,0,24
+India,Tamil Nadu,"Calendar Year (Jan - Dec), 2017",178836,1560,1802,257,151.7078846,118.0015741,82221,1362,22,242040,420876,5397,43,228,3511,20914,2376
+India,Telangana,"Calendar Year (Jan - Dec), 2017",119858,805,98,55,120.3862194,62.2505574,17541,1466,435,13339,133197,17521,7,1209,10840,307,1365
+India,The Dadra and Nagar Haveli and Daman and Diu,"Calendar Year (Jan - Dec), 2017",633.00000000000000000000,9.00000000000000000000,1.00000000000000000000,0.00000000000000000000,2.164596100000000000000000000,0.828931900000000000000000000,0.00000000000000000000,0.00000000000000000000,5.00000000000000000000,58.00000000000000000000,691.00000000000000000000,46.00000000000000000000,0.00000000000000000000,1.00000000000000000000,95.00000000000000000000,0.00000000000000000000,21.00000000000000000000
+India,Tripura,"Calendar Year (Jan - Dec), 2017",3918,124,16,1,4.3691751,1.1242132,51,1,1,320,4238,972,0,7,149,0,37
+India,Uttar Pradesh,"Calendar Year (Jan - Dec), 2017",310084,4324,2055,58,293.3475292,100.126997,137693,11444,88,289998,600082,56011,39,4971,20717,1863,825
+India,Uttarakhand,"Calendar Year (Jan - Dec), 2017",12889,181,7,13,15.5067807,8.1757666,5990,96,11,15972,28861,1944,5,124,1122,75,159
+India,West Bengal,"Calendar Year (Jan - Dec), 2017",163999,2001,167,15,100.6620262,29.766204,37612,138,122,31538,195537,30992,21,568,10052,88,577
+India,Andaman and Nicobar Islands,"Calendar Year (Jan - Dec), 2016",802,14,7,3,0.7629905,0.2844064,0,0,6,1689,2491,108,0,3,82,0,12
+India,Andhra Pradesh,"Calendar Year (Jan - Dec), 2016",106774,1123,40,164,113.1794964,46.5213801,69689,2335,405,22615,129389,16362,5,616,5931,46,809
+India,Arunachal Pradesh,"Calendar Year (Jan - Dec), 2016",2534,46,10,14,12.9495,2.2214152,1,0,1,166,2700,367,0,4,167,1,57
+India,Assam,"Calendar Year (Jan - Dec), 2016",102250,1149,343,23,94.1684732,19.5053646,6241,4,1,4764,107014,20869,0,696,6519,149,436
+India,Bihar,"Calendar Year (Jan - Dec), 2016",164163,2581,207,164,100.2107867,19.8449101,43772,5701,25,25533,189696,13400,10,309,8628,41,2335
+India,Chandigarh,"Calendar Year (Jan - Dec), 2016",2996,26,2,15,7.9927954,2.7808064,1424,1,0,1260,4256,414,4,26,210,3,96
+India,Chhattisgarh,"Calendar Year (Jan - Dec), 2016",55029,957,9,61,43.0565367,14.495642,23576,243,402,29163,84192,5947,0,90,1282,15,1953
+India,Delhi,"Calendar Year (Jan - Dec), 2016",209519,528,22,16,3278.814716,157.0157603,24293,54,2,7401,216920,15310,154,98,6427,18,2499
+India,Goa,"Calendar Year (Jan - Dec), 2016",2692,30,11,11,9.317018,2.113208,249,11,11,1014,3706,371,22,31,199,1,21
+India,Gujarat,"Calendar Year (Jan - Dec), 2016",147122,1120,44,258,207.6014665,62.988387,77230,1322,281,288300,435422,8532,2,362,3463,16,1681
+India,Haryana,"Calendar Year (Jan - Dec), 2016",88527,1057,1286,139,261.5362188,76.7635302,14686,639,0,54584,143111,9839,8,401,5123,44,1186
+India,Himachal Pradesh,"Calendar Year (Jan - Dec), 2016",13386,101,58,28,19.5650217,8.6154091,236,116,2,3863,17249,1222,4,31,507,178,204
+India,Jammu and Kashmir,"Calendar Year (Jan - Dec), 2016",23965.08619806137037397410,138.89401412696276042220,180.95346910907120195850,53.79697730269684382550,24.4473637458378051595762981170,11.016807345670124829377053620,1000.62377783016129515430,0.97812686004903352410,0.00000000000000000000,2076.56332388409817166430,26041.64952194546854563840,2787.66155113974554368500,0.00000000000000000000,27.38755208137293867480,627.95744415147952247220,3.91250744019613409640,193.66911828970863777180
+India,Jharkhand,"Calendar Year (Jan - Dec), 2016",40710,1514,106,119,27.9243861,5.9087803,18411,525,280,7107,47817,5453,2,259,3119,139,140
+India,Karnataka,"Calendar Year (Jan - Dec), 2016",148402,1573,148,25,276.5805465,105.3072547,37839,1869,374,31077,179479,14131,12,1101,7980,178,453
+India,Kerala,"Calendar Year (Jan - Dec), 2016",260097,305,317,430,83.0546576,18.2417155,29195,810,182,447773,707870,10034,15,283,5217,28,628
+India,Ladakh,"Calendar Year (Jan - Dec), 2016",535.91380193862962602590,3.10598587303723957780,4.04653089092879804150,1.20302269730315617450,0.5466986241621948404237018830,0.246360854329875170622946380,22.37622216983870484570,0.02187313995096647590,0.00000000000000000000,46.43667611590182833570,582.35047805453145436160,62.33844886025445631500,0.00000000000000000000,0.61244791862706132520,14.04255584852047752780,0.08749255980386590360,4.33088171029136222820
+India,Lakshadweep,"Calendar Year (Jan - Dec), 2016",36,0,0,0,0.026742,0,0,0,1,14,50,9,0,0,1,0,0
+India,Madhya Pradesh,"Calendar Year (Jan - Dec), 2016",264418,2004,21,402,236.7456807,72.5673815,98964,4922,1823,100736,365154,26604,2,258,2825,32,7369
+India,Maharashtra,"Calendar Year (Jan - Dec), 2016",261714,2299,178,1016,3371.276576,266.9169112,223360,1750,403,169152,430866,31388,38,2380,13008,170,6606
+India,Manipur,"Calendar Year (Jan - Dec), 2016",3170,78,335,0,8.550415835,2.9929104,0,2,1,928,4098,253,0,11,137,2,10
+India,Meghalaya,"Calendar Year (Jan - Dec), 2016",3366,108,51,0,14.97956752,1.7080632,0,0,0,216,3582,372,0,39,324,0,84
+India,Mizoram,"Calendar Year (Jan - Dec), 2016",2425,29,0,5,8.9105931,3.4995726,0,0,0,375,2800,120,0,1,119,1,53
+India,Nagaland,"Calendar Year (Jan - Dec), 2016",1376,36,15,10,8.1380584,1.8858279,35,0,0,532,1908,105,0,2,140,3,18
+India,Odisha,"Calendar Year (Jan - Dec), 2016",81460,1328,25,569,111.2783073,28.41489724,32473,1796,681,22105,103565,17837,1,317,3756,1,994
+India,Puducherry,"Calendar Year (Jan - Dec), 2016",4086,33,8,5,3.6023037,1.4432814,304,3,1,799,4885,95,33,2,104,1,72
+India,Punjab,"Calendar Year (Jan - Dec), 2016",40007,771,32,171,106.0124781,38.8291771,22661,132,2,17732,57739,5105,9,102,4271,4,117
+India,Rajasthan,"Calendar Year (Jan - Dec), 2016",180398,1551,82,387,240.0563412,131.3581248,59721,5134,1195,70749,251147,27422,25,941,23589,1381,2273
+India,Sikkim,"Calendar Year (Jan - Dec), 2016",809,17,0,14,1.90739,0.7655147,0,1,0,211,1020,153,0,1,61,0,27
+India,Tamil Nadu,"Calendar Year (Jan - Dec), 2016",179896,1603,1827,170,136.8868809,91.5349201,81639,1291,19,287473,467369,4463,24,144,3499,1,2217
+India,Telangana,"Calendar Year (Jan - Dec), 2016",108991,1046,90,89,113.5501512,60.9203499,15516,1529,375,11282,120273,15374,4,593,9286,22,998
+India,The Dadra and Nagar Haveli and Daman and Diu,"Calendar Year (Jan - Dec), 2016",515.00000000000000000000,9.00000000000000000000,0.00000000000000000000,0.00000000000000000000,5.226944000000000000000000000,1.960314800000000000000000000,0.00000000000000000000,0.00000000000000000000,2.00000000000000000000,28.00000000000000000000,543.00000000000000000000,69.00000000000000000000,0.00000000000000000000,1.00000000000000000000,45.00000000000000000000,0.00000000000000000000,7.00000000000000000000
+India,Tripura,"Calendar Year (Jan - Dec), 2016",3933,145,7,2,2.4275433,0.722421,12,0,3,148,4081,1013,0,8,146,0,25
+India,Uttar Pradesh,"Calendar Year (Jan - Dec), 2016",282171,4889,1414,30,630.0749726,167.7097782,124720,10426,4,211854,494025,49262,6,2639,15765,2130,1438
+India,Uttarakhand,"Calendar Year (Jan - Dec), 2016",10867,194,4,28,13.26644,7.1634128,5142,65,3,5207,16074,1588,0,62,1289,49,124
+India,West Bengal,"Calendar Year (Jan - Dec), 2016",176569,2044,102,16,158.4457479,24.6915306,56447,119,83,27831,204400,32513,2,478,9663,74,709

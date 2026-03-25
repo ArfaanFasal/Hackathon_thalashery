@@ -1,19 +1,15 @@
-"""Business logic for CivicSafe AI backend.
-
-This module keeps FastAPI route handlers slim by implementing all processing
-steps here: routing, complaint analysis, scam checks, service guidance,
-clustering, dashboard aggregation, and explainable report generation.
-"""
+"""Business logic for CivicSafe AI backend."""
 
 from __future__ import annotations
 
 import re
 import uuid
 from collections import Counter, defaultdict
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
+from civicsafe_brain import ai_service as brain
 from models import (
     ClusterSummary,
     ComplaintRequest,
@@ -29,21 +25,17 @@ from models import (
 )
 
 
-# -----------------------------
-# In-memory hackathon storage
-# -----------------------------
 HISTORY_DB: List[HistoryRecord] = []
 REPORT_DB: Dict[str, ReportResponse] = {}
-
 
 SERVICE_CATALOG: Dict[str, Dict[str, Any]] = {
     "aadhaar": {
         "documents_required": ["Identity proof", "Address proof", "Date of birth proof"],
         "steps": [
-            "Visit nearest Aadhaar enrollment or update center.",
-            "Fill Aadhaar update/application form.",
+            "Visit the nearest Aadhaar enrollment or update center.",
+            "Fill the Aadhaar update or application form.",
             "Submit biometric and demographic details.",
-            "Collect acknowledgment slip and track status.",
+            "Collect the acknowledgment slip and track status online.",
         ],
         "official_website": "https://uidai.gov.in",
         "support_channel": "UIDAI helpline: 1947",
@@ -51,10 +43,10 @@ SERVICE_CATALOG: Dict[str, Dict[str, Any]] = {
     "pan": {
         "documents_required": ["Identity proof", "Address proof", "Passport-size photo"],
         "steps": [
-            "Open NSDL/UTIITSL PAN application portal.",
+            "Open the NSDL or UTIITSL PAN application portal.",
             "Fill Form 49A with valid details.",
-            "Upload required documents and pay fee.",
-            "Track PAN application status online.",
+            "Upload required documents and pay the fee.",
+            "Track the PAN application status online.",
         ],
         "official_website": "https://www.onlineservices.nsdl.com",
         "support_channel": "NSDL support desk",
@@ -62,10 +54,10 @@ SERVICE_CATALOG: Dict[str, Dict[str, Any]] = {
     "passport": {
         "documents_required": ["Address proof", "Date of birth proof", "Photo ID"],
         "steps": [
-            "Register on Passport Seva portal.",
-            "Complete passport application form.",
-            "Pay fee and book appointment.",
-            "Attend PSK appointment and police verification.",
+            "Register on the Passport Seva portal.",
+            "Complete the passport application form.",
+            "Pay the fee and book the appointment.",
+            "Attend the PSK appointment and police verification.",
         ],
         "official_website": "https://www.passportindia.gov.in",
         "support_channel": "Passport Seva support center",
@@ -73,18 +65,20 @@ SERVICE_CATALOG: Dict[str, Dict[str, Any]] = {
     "loan": {
         "documents_required": ["Identity proof", "Income proof", "Bank statements"],
         "steps": [
-            "Choose lender and compare rates.",
-            "Submit application with KYC and income documents.",
-            "Complete verification process.",
+            "Choose a lender and compare rates.",
+            "Submit the application with KYC and income documents.",
+            "Complete the verification process.",
             "Review sanction terms before acceptance.",
         ],
         "official_website": "https://www.rbi.org.in",
-        "support_channel": "Contact verified bank branch only",
+        "support_channel": "Contact a verified bank branch only",
     },
 }
 
-
 LOCATION_COORDS: Dict[str, Tuple[float, float]] = {
+    "thalassery": (11.748, 75.4929),
+    "ward 8": (11.754, 75.488),
+    "ward 12": (11.746, 75.497),
     "delhi": (28.6139, 77.2090),
     "mumbai": (19.0760, 72.8777),
     "bengaluru": (12.9716, 77.5946),
@@ -96,13 +90,13 @@ LOCATION_COORDS: Dict[str, Tuple[float, float]] = {
     "unknown": (20.5937, 78.9629),
 }
 
-
 HINGLISH_NORMALIZATION = {
-    "current nahi hai": "no electricity",
+    "current nahi hai": "no current",
+    "bijli nahi hai": "no electricity",
     "paani nahi aa raha": "no water",
     "road kharab hai": "damaged road",
+    "kooda": "garbage",
 }
-
 
 SCAM_KEYWORDS = {
     "otp": 20,
@@ -118,9 +112,120 @@ SCAM_KEYWORDS = {
     "kyc": 10,
 }
 
+NUMBER_WORDS = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+    "eleven": 11,
+    "twelve": 12,
+}
+
+CATEGORY_MAP: Dict[str, Dict[str, Any]] = {
+    "electricity": {
+        "keywords": ["no current", "power cut", "electricity gone", "voltage problem", "transformer", "power outage"],
+        "issue": "Power outage",
+        "subcategory": "power_supply",
+        "department": "Electricity Department / KSEB",
+        "complaint_type": "grievance",
+        "essential_service": True,
+    },
+    "garbage": {
+        "keywords": ["garbage", "waste", "trash", "not collected", "waste collection", "trash piling"],
+        "issue": "Garbage not collected",
+        "subcategory": "waste_collection",
+        "department": "Municipality Sanitation Department",
+        "complaint_type": "grievance",
+        "public_health_risk": True,
+    },
+    "water": {
+        "keywords": ["no water", "water supply", "pipe leakage", "drinking water", "water shortage", "pipeline"],
+        "issue": "Water supply issue",
+        "subcategory": "water_supply",
+        "department": "Water Authority",
+        "complaint_type": "grievance",
+        "essential_service": True,
+    },
+    "road": {
+        "keywords": ["road repair", "pothole", "road damaged", "bad road", "road issue"],
+        "issue": "Road repair request",
+        "subcategory": "road_maintenance",
+        "department": "Public Works Department",
+        "complaint_type": "service_request",
+    },
+    "drainage": {
+        "keywords": ["drainage", "drain blocked", "sewage", "overflow", "drain blockage"],
+        "issue": "Drainage or sewage issue",
+        "subcategory": "drainage_blockage",
+        "department": "Municipal Engineering Department",
+        "complaint_type": "grievance",
+        "public_health_risk": True,
+    },
+    "police": {
+        "keywords": ["theft", "harassment", "violence", "police complaint", "fraud", "unsafe", "crime"],
+        "issue": "Public safety complaint",
+        "subcategory": "law_and_order",
+        "department": "Police Department",
+        "complaint_type": "emergency",
+        "essential_service": True,
+        "safety_risk": True,
+    },
+    "revenue": {
+        "keywords": ["revenue certificate", "income certificate", "ownership certificate", "legal certificate"],
+        "issue": "Revenue certificate request",
+        "subcategory": "revenue_certificate",
+        "department": "Revenue Department",
+        "complaint_type": "certificate_request",
+        "certificate_delay": True,
+    },
+    "health": {
+        "keywords": ["medical", "hospital", "health", "clinic", "public health"],
+        "issue": "Health service issue",
+        "subcategory": "public_health",
+        "department": "Health Department",
+        "complaint_type": "emergency",
+        "essential_service": True,
+        "public_health_risk": True,
+    },
+    "street_lights": {
+        "keywords": ["street light", "streetlight", "light not working", "junction light"],
+        "issue": "Street light not working",
+        "subcategory": "street_lighting",
+        "department": "Electrical Maintenance Wing",
+        "complaint_type": "service_request",
+    },
+    "certificate_services": {
+        "keywords": ["certificate", "document", "service request", "apply certificate"],
+        "issue": "Government certificate request",
+        "subcategory": "certificate_service",
+        "department": "Citizen Service Center",
+        "complaint_type": "certificate_request",
+        "certificate_delay": True,
+    },
+}
+
+SEVERITY_KEYWORDS = {
+    "emergency": 5,
+    "accident": 5,
+    "unsafe": 5,
+    "danger": 5,
+    "children affected": 5,
+    "injury": 5,
+    "fire": 5,
+    "overflow": 4,
+    "severe": 3,
+    "urgent": 3,
+}
+
 
 def _utcnow() -> datetime:
-    return datetime.utcnow()
+    return datetime.now(UTC)
 
 
 def _new_id(prefix: str) -> str:
@@ -128,25 +233,19 @@ def _new_id(prefix: str) -> str:
 
 
 def detect_language(text: str) -> str:
-    """Detect language using simple heuristics for demo purposes."""
     lowered = text.lower()
-    devanagari_present = bool(re.search(r"[\u0900-\u097F]", text))
-    malayalam_present = bool(re.search(r"[\u0D00-\u0D7F]", text))
-
-    if malayalam_present:
+    if re.search(r"[\u0D00-\u0D7F]", text):
         return "Malayalam"
-    if devanagari_present:
+    if re.search(r"[\u0900-\u097F]", text):
         return "Hindi"
     if any(phrase in lowered for phrase in HINGLISH_NORMALIZATION):
         return "Hinglish"
-    hindi_roman_clues = ["nahi", "paani", "sadak", "bijli", "kharab", "hai"]
-    if sum(1 for token in hindi_roman_clues if token in lowered) >= 2:
+    if sum(1 for token in ["nahi", "paani", "sadak", "bijli", "hai"] if token in lowered) >= 2:
         return "Hinglish"
     return "English"
 
 
 def normalize_hinglish(text: str) -> str:
-    """Normalize known Hinglish phrases into plain English."""
     normalized = text.lower()
     for source, target in HINGLISH_NORMALIZATION.items():
         normalized = normalized.replace(source, target)
@@ -154,51 +253,84 @@ def normalize_hinglish(text: str) -> str:
 
 
 def mock_translate_to_english(text: str, language: str) -> str:
-    """Mock translation step for non-English messages."""
     if language in {"Hindi", "Malayalam"}:
         return f"{text} (translated to English - demo)"
     return text
 
 
-def classify_issue_type(text: str) -> str:
-    """Map complaint text to issue categories via keyword rules."""
+def _number_from_token(token: str) -> Optional[int]:
+    if token.isdigit():
+        return int(token)
+    return NUMBER_WORDS.get(token.lower())
+
+
+def extract_duration(text: str, ai_duration_text: Optional[str] = None) -> Tuple[str, int, Optional[float], Optional[str]]:
+    source = f"{text} {ai_duration_text or ''}".strip().lower()
+    match = re.search(
+        r"\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+"
+        r"(day|days|week|weeks|month|months|year|years)\b",
+        source,
+    )
+    if not match:
+        return "Not specified", 0, None, None
+
+    value = _number_from_token(match.group(1))
+    unit = match.group(2)
+    if value is None:
+        return "Not specified", 0, None, None
+
+    days = value
+    if unit.startswith("week"):
+        days = value * 7
+    elif unit.startswith("month"):
+        days = value * 30
+    elif unit.startswith("year"):
+        days = value * 365
+
+    return f"{value} {unit}", days, float(value), unit
+
+
+def extract_location(text: str, ai_location: Optional[str] = None) -> str:
+    if ai_location:
+        cleaned_ai_location = ai_location.strip()
+        if cleaned_ai_location and cleaned_ai_location.lower() not in {"unknown", "ward", "the", "our area", "area"}:
+            return cleaned_ai_location.title()
+
     lowered = text.lower()
-    rules = {
-        "Road Issue": ["road", "pothole", "traffic", "street", "bridge", "damaged road"],
-        "Water Issue": ["water", "paani", "leakage", "pipeline", "drain"],
-        "Electricity Issue": ["electricity", "power", "current", "transformer", "voltage"],
-        "Sanitation Issue": ["garbage", "waste", "sewage", "toilet", "sanitation"],
-        "Safety Issue": ["crime", "unsafe", "harassment", "accident", "fire", "injury"],
-    }
-    for issue, keywords in rules.items():
-        if any(word in lowered for word in keywords):
-            return issue
-    return "Other Issue"
+    ward_match = re.search(r"\bward\s+\d+\b", lowered)
+    if ward_match:
+        return ward_match.group(0).title()
 
+    pin_match = re.search(r"\bpincode\s+\d{6}\b", lowered)
+    if pin_match:
+        return pin_match.group(0).title()
 
-def detect_urgency(text: str) -> str:
-    """Classify urgency with simple priority words."""
-    lowered = text.lower()
-    if any(k in lowered for k in ["accident", "fire", "injury", "emergency"]):
-        return "Critical"
-    if any(k in lowered for k in ["urgent", "danger", "severe"]):
-        return "High"
-    if any(k in lowered for k in ["issue", "problem", "not working"]):
-        return "Medium"
-    return "Low"
-
-
-def extract_location(text: str) -> str:
-    """Extract a location token from text using known city names."""
-    lowered = text.lower()
     for city in LOCATION_COORDS:
         if city != "unknown" and city in lowered:
             return city.title()
+
+    for pattern in [r"\bnear\s+([a-z0-9\s-]+?)(?:$| for | since | in | at )", r"\bin\s+([a-z0-9\s-]+?)(?:$| for | since | near )"]:
+        match = re.search(pattern, lowered)
+        if match and match.group(1).strip():
+            candidate = match.group(1).strip()
+            if candidate.lower() not in {"the", "ward", "our area", "area"}:
+                return candidate.title()
     return "Unknown"
 
 
+def extract_severity_keywords(text: str, ai_keywords: Optional[List[str]] = None) -> List[str]:
+    lowered = text.lower()
+    found = [keyword for keyword in SEVERITY_KEYWORDS if keyword in lowered]
+    if ai_keywords:
+        found.extend(keyword.lower() for keyword in ai_keywords if keyword)
+    deduped: List[str] = []
+    for keyword in found:
+        if keyword not in deduped:
+            deduped.append(keyword)
+    return deduped
+
+
 def infer_intent(text: str) -> str:
-    """Detect whether user asks for complaint, scam check, or service guidance."""
     lowered = text.lower()
     if any(k in lowered for k in ["otp", "lottery", "kyc", "click", "scam", "fraud", "prize"]):
         return "scam"
@@ -207,18 +339,129 @@ def infer_intent(text: str) -> str:
     return "complaint"
 
 
-def _risk_score_from_urgency(urgency: str) -> int:
-    return {"Low": 25, "Medium": 45, "High": 70, "Critical": 90}.get(urgency, 30)
+def _resolve_mode(text: str) -> str:
+    try:
+        ai_intent = brain.analyze_intent(text).intent
+        if ai_intent == "scam_report":
+            return "scam"
+        if ai_intent == "service_guidance":
+            return "service"
+        if ai_intent == "complaint_report":
+            return "complaint"
+    except Exception:
+        pass
+    return infer_intent(text)
 
 
-def _create_insight(issue_type: str, location: str, urgency: str, cluster_size: int) -> str:
-    if issue_type == "Water Issue" and cluster_size > 1:
-        return "Repeated water issue pattern detected."
-    if urgency in {"High", "Critical"}:
-        return "Escalation recommended due to high urgency."
-    if location != "Unknown" and cluster_size > 2:
-        return "Increasing complaints in this area."
-    return "Pattern recorded; monitoring for trend changes."
+def _classify_from_rules(text: str) -> Dict[str, Any]:
+    lowered = text.lower()
+    best_category = "general"
+    best_config: Dict[str, Any] = {
+        "issue": "General civic issue",
+        "subcategory": "general_request",
+        "department": "Local Administration",
+        "complaint_type": "grievance",
+    }
+    best_score = 0
+
+    for category, config in CATEGORY_MAP.items():
+        score = sum(1 for keyword in config["keywords"] if keyword in lowered)
+        if score > best_score:
+            best_score = score
+            best_category = category
+            best_config = config
+
+    return {"category": best_category, **best_config}
+
+
+def _normalize_complaint_type(raw_type: Optional[str], category: str, text: str) -> str:
+    lowered = text.lower()
+    if any(word in lowered for word in ["emergency", "accident", "unsafe", "injury", "fire"]):
+        return "emergency"
+    if "certificate" in lowered or category in {"revenue", "certificate_services"}:
+        return "certificate_request"
+    if any(word in lowered for word in ["need", "request", "apply", "not working", "repair"]):
+        return "service_request"
+    if raw_type:
+        value = raw_type.lower().replace(" ", "_")
+        if value in {"service_request", "grievance", "emergency", "certificate_request"}:
+            return value
+    return CATEGORY_MAP.get(category, {}).get("complaint_type", "grievance")
+
+
+def _normalize_priority_label(score: int) -> str:
+    if score >= 8:
+        return "high"
+    if score >= 4:
+        return "medium"
+    return "low"
+
+
+def _priority_score(
+    category: str,
+    complaint_type: str,
+    duration_days: int,
+    severity_keywords: List[str],
+    similar_count: int,
+) -> Tuple[int, str, List[str]]:
+    config = CATEGORY_MAP.get(category, {})
+    score = 0
+    reasons: List[str] = []
+
+    if config.get("essential_service") or category in {"electricity", "water", "police", "revenue", "health"}:
+        score += 4
+        reasons.append("Essential service or critical authority involved")
+    elif category in {"garbage", "drainage", "road", "street_lights"}:
+        score += 2
+        reasons.append("Civic infrastructure impact")
+
+    if complaint_type == "certificate_request":
+        score += 3
+        reasons.append("Certificate or legal service dependency")
+    if complaint_type == "service_request":
+        score += 2
+        reasons.append("Actionable department service request")
+    if complaint_type == "emergency":
+        score += 5
+        reasons.append("Emergency or public safety complaint")
+
+    if duration_days >= 2:
+        score += 2
+        reasons.append("Issue duration is more than 2 days")
+    if duration_days >= 7:
+        score += 2
+        reasons.append("Issue duration is more than 7 days")
+    if duration_days >= 30:
+        score += 3
+        reasons.append("Issue duration is more than 30 days")
+
+    if config.get("public_health_risk"):
+        score += 4
+        reasons.append("Public health risk detected")
+    if category in {"electricity", "water"} and duration_days >= 2:
+        score += 2
+        reasons.append("Essential utility disruption has lasted multiple days")
+
+    if severity_keywords:
+        score += min(5, max(SEVERITY_KEYWORDS.get(keyword, 2) for keyword in severity_keywords))
+        reasons.append(f"Severity keywords present: {', '.join(severity_keywords[:3])}")
+
+    if similar_count >= 5:
+        score += 5
+        reasons.append("Many similar complaints found in the same area")
+    elif similar_count >= 2:
+        score += 2
+        reasons.append("Repeated similar complaints in the same area")
+
+    return score, _normalize_priority_label(score), reasons
+
+
+def _urgency_from_priority(priority: str, severity_keywords: List[str]) -> str:
+    if "emergency" in severity_keywords or "accident" in severity_keywords or priority == "high":
+        return "High"
+    if priority == "medium":
+        return "Medium"
+    return "Low"
 
 
 def _save_record(record_type: str, raw_input: Dict[str, Any], processed_output: Dict[str, Any], record_id: str) -> HistoryRecord:
@@ -236,74 +479,202 @@ def _save_record(record_type: str, raw_input: Dict[str, Any], processed_output: 
 def get_history(record_type: Optional[str] = None) -> List[HistoryRecord]:
     if record_type is None:
         return HISTORY_DB
-    return [r for r in HISTORY_DB if r.type == record_type]
+    return [record for record in HISTORY_DB if record.type == record_type]
 
 
 def get_record_by_id(record_id: str) -> Optional[HistoryRecord]:
     return next((record for record in HISTORY_DB if record.id == record_id), None)
 
 
-def _cluster_key(issue_type: str, location: str) -> str:
-    return f"{issue_type.lower()}::{location.lower()}"
+def _cluster_key(category: str, location: str) -> str:
+    normalized_category = re.sub(r"[^a-z0-9]+", "_", category.lower()).strip("_")
+    normalized_location = re.sub(r"[^a-z0-9]+", "_", location.lower()).strip("_")
+    return f"{normalized_category}::{normalized_location}"
+
+
+def _recent_matching_complaints(category: str, location: str, days: int = 7) -> List[HistoryRecord]:
+    cutoff = _utcnow() - timedelta(days=days)
+    matches: List[HistoryRecord] = []
+    for record in HISTORY_DB:
+        if record.type != "complaint":
+            continue
+        if record.created_at < cutoff:
+            continue
+        if record.processed_output.get("category") == category and record.processed_output.get("location") == location:
+            matches.append(record)
+    return matches
 
 
 def get_cluster_summaries() -> List[ClusterSummary]:
-    complaint_records = [r for r in HISTORY_DB if r.type == "complaint"]
+    complaint_records = [record for record in HISTORY_DB if record.type == "complaint"]
     grouped: Dict[str, List[HistoryRecord]] = defaultdict(list)
     for record in complaint_records:
-        output = record.processed_output
-        key = _cluster_key(output.get("issue_type", "Other Issue"), output.get("location", "Unknown"))
+        key = _cluster_key(
+            str(record.processed_output.get("category", "general")),
+            str(record.processed_output.get("location", "Unknown")),
+        )
         grouped[key].append(record)
 
     summaries: List[ClusterSummary] = []
-    for idx, (_, records) in enumerate(grouped.items(), start=1):
-        output = records[0].processed_output
-        issue_type = output.get("issue_type", "Other Issue")
-        location = output.get("location", "Unknown")
-        size = len(records)
-        insight = _create_insight(issue_type, location, output.get("urgency", "Low"), size)
+    for index, records in enumerate(grouped.values(), start=1):
+        sample = records[0].processed_output
+        cluster_size = len(records)
+        escalated = any(bool(record.processed_output.get("escalated")) for record in records)
+        priority = "high" if any(record.processed_output.get("priority") == "high" for record in records) else (
+            "medium" if any(record.processed_output.get("priority") == "medium" for record in records) else "low"
+        )
+        insight = (
+            "Repeated complaints indicate a group issue and authority escalation."
+            if cluster_size >= 5
+            else "Repeated complaints detected in this area."
+            if cluster_size >= 2
+            else "Single complaint cluster currently being monitored."
+        )
         summaries.append(
             ClusterSummary(
-                cluster_id=f"cluster_{idx}",
-                issue_type=issue_type,
-                location=location,
-                cluster_size=size,
+                cluster_id=f"cluster_{index}",
+                issue_type=str(sample.get("issue_type", "General civic issue")),
+                category=str(sample.get("category", "general")),
+                department=str(sample.get("department", "Local Administration")),
+                location=str(sample.get("location", "Unknown")),
+                cluster_size=cluster_size,
+                priority=priority,
+                escalated=escalated,
                 insight=insight,
             )
         )
     return summaries
 
 
+def _citizen_message(
+    issue_type: str,
+    category: str,
+    department: str,
+    duration_text: str,
+    priority: str,
+    similar_count: int,
+    escalated: bool,
+) -> str:
+    duration_part = (
+        f" Since the issue has lasted for {duration_text}, it has been marked {priority} priority."
+        if duration_text != "Not specified"
+        else f" It has been marked {priority} priority based on the issue type and impact."
+    )
+    similar_part = (
+        f" We also found {similar_count} similar complaint(s) from the same area."
+        if similar_count
+        else " No recent similar complaints were found in the same area."
+    )
+    escalation_part = " The case has been escalated for authority attention." if escalated else ""
+    return (
+        f"Your complaint has been identified as {issue_type.lower()} under the {category} category and routed to "
+        f"{department}.{duration_part}{similar_part}{escalation_part}"
+    )
+
+
 def analyze_complaint(payload: ComplaintRequest) -> ComplaintResponse:
+    ai_structured = brain.structure_complaint(payload.text)
+
     language = detect_language(payload.text) if payload.language == "auto" else payload.language
+    if ai_structured.detected_language and ai_structured.detected_language != "Unknown":
+        language = ai_structured.detected_language
+
     normalized = normalize_hinglish(payload.text)
     translated = mock_translate_to_english(normalized, language)
-    issue_type = classify_issue_type(translated)
-    urgency = detect_urgency(translated)
-    location = extract_location(translated)
+
+    rule_classification = _classify_from_rules(translated)
+    ai_category = (ai_structured.category or "").strip().lower().replace(" ", "_")
+    if ai_category in CATEGORY_MAP:
+        rule_classification = {"category": ai_category, **CATEGORY_MAP[ai_category]}
+
+    category = str(rule_classification["category"])
+    issue_type = str(rule_classification["issue"])
+    if ai_structured.main_issue and ai_structured.main_issue.lower() != "unknown":
+        issue_type = ai_structured.main_issue
+    elif ai_structured.issue_type and ai_structured.issue_type.lower() != "unknown":
+        issue_type = ai_structured.issue_type
+    subcategory = ai_structured.subcategory or str(rule_classification["subcategory"])
+    department = ai_structured.required_department or str(rule_classification["department"])
+    location = extract_location(translated, ai_structured.location)
+    duration_text, duration_days, duration_value, duration_unit = extract_duration(translated, ai_structured.duration_text)
+    severity_keywords = extract_severity_keywords(translated, ai_structured.severity_keywords)
+    complaint_type = _normalize_complaint_type(ai_structured.complaint_type, category, translated)
+
+    similar_records = _recent_matching_complaints(category, location)
+    similar_count = len(similar_records)
+    priority_score, priority, priority_reasons = _priority_score(
+        category=category,
+        complaint_type=complaint_type,
+        duration_days=duration_days,
+        severity_keywords=severity_keywords,
+        similar_count=similar_count,
+    )
+    group_issue = similar_count >= 2
+    escalated = similar_count >= 4 or priority == "high"
+    action = "escalate_to_authority" if escalated else "route_to_department"
+    urgency = _urgency_from_priority(priority, severity_keywords)
+    risk_score = min(100, 15 + priority_score * 9)
 
     current_clusters = get_cluster_summaries()
-    existing = next((c for c in current_clusters if c.issue_type == issue_type and c.location == location), None)
-    cluster_size = (existing.cluster_size + 1) if existing else 1
+    existing = next(
+        (
+            cluster
+            for cluster in current_clusters
+            if cluster.category == category and cluster.location.lower() == location.lower()
+        ),
+        None,
+    )
+    cluster_size = (existing.cluster_size + 1) if existing else (similar_count + 1)
     cluster_id = existing.cluster_id if existing else f"cluster_{len(current_clusters) + 1}"
 
-    base_risk = _risk_score_from_urgency(urgency)
-    risk_boost = 10 if cluster_size > 2 else 0
-    risk_score = min(100, base_risk + risk_boost)
-
-    insight = _create_insight(issue_type, location, urgency, cluster_size)
-    confidence = round(0.55 + min(0.4, (risk_score / 250)), 2)
+    insight = (
+        "Community-level issue detected; similar complaints are rising in the same area."
+        if group_issue
+        else "Structured as an individual complaint and added for trend monitoring."
+    )
+    citizen_message = _citizen_message(
+        issue_type=issue_type,
+        category=category,
+        department=department,
+        duration_text=duration_text,
+        priority=priority,
+        similar_count=similar_count,
+        escalated=escalated,
+    )
+    confidence = round(0.62 + min(0.33, priority_score / 20), 2)
 
     record_id = _new_id("cmp")
     structured_output = {
+        "original_text": payload.text,
+        "intent": "civic_complaint",
+        "main_issue": issue_type,
         "issue_type": issue_type,
-        "urgency": urgency,
+        "category": category,
+        "subcategory": subcategory,
+        "department": department,
+        "duration_text": duration_text,
+        "duration_value": duration_value,
+        "duration_unit": duration_unit,
+        "duration_days": duration_days,
         "location": location,
+        "complaint_type": complaint_type,
+        "severity_keywords": severity_keywords,
+        "priority": priority,
+        "priority_score": priority_score,
+        "priority_reasons": priority_reasons,
+        "group_issue": group_issue,
+        "similar_complaint_count": similar_count,
         "cluster_id": cluster_id,
         "cluster_size": cluster_size,
+        "escalated": escalated,
+        "action": action,
+        "urgency": urgency,
         "risk_score": risk_score,
         "insight": insight,
+        "citizen_message": citizen_message,
+        "ai_summary": ai_structured.summary,
     }
+
     record = _save_record(
         record_type="complaint",
         raw_input={"text": payload.text, "language": payload.language, "complaint_mode": payload.complaint_mode},
@@ -324,20 +695,34 @@ def analyze_complaint(payload: ComplaintRequest) -> ComplaintResponse:
         translated_text=translated,
         issue_type=issue_type,
         urgency=urgency,
+        complaint_type=complaint_type,
+        category=category,
+        subcategory=subcategory,
+        department=department,
+        duration_text=duration_text,
+        duration_days=duration_days,
         location=location,
         cluster_id=cluster_id,
         cluster_size=cluster_size,
         risk_score=risk_score,
+        priority=priority,
+        priority_score=priority_score,
+        group_issue=group_issue,
+        similar_complaint_count=similar_count,
+        escalated=escalated,
+        action=action,
         insight=insight,
+        citizen_message=citizen_message,
         confidence=confidence,
         structured_output=structured_output,
     )
 
 
 def analyze_scam(payload: ScamRequest) -> ScamResponse:
+    ai_scam = brain.analyze_scam(payload.text)
     text = payload.text.lower()
-    matched = [kw for kw in SCAM_KEYWORDS if kw in text]
-    score = sum(SCAM_KEYWORDS[kw] for kw in matched)
+    matched = [keyword for keyword in SCAM_KEYWORDS if keyword in text]
+    score = sum(SCAM_KEYWORDS[keyword] for keyword in matched)
 
     if payload.url:
         parsed = urlparse(payload.url)
@@ -345,21 +730,21 @@ def analyze_scam(payload: ScamRequest) -> ScamResponse:
             score += 10
         if parsed.scheme == "http":
             score += 8
-        if any(x in parsed.netloc for x in ["bit.ly", "tinyurl", "free", "win"]):
+        if any(value in parsed.netloc for value in ["bit.ly", "tinyurl", "free", "win"]):
             score += 10
 
     probability = min(100, max(5, score))
-    if probability >= 75:
-        risk_level = "High"
-    elif probability >= 45:
-        risk_level = "Medium"
-    else:
-        risk_level = "Low"
+    if ai_scam.scam_detected:
+        probability = max(probability, {"high": 88, "medium": 62, "low": 42}.get(ai_scam.risk_level, 55))
+    risk_level = "High" if probability >= 75 else "Medium" if probability >= 45 else "Low"
 
-    if matched:
-        reason = f"Suspicious markers detected: {', '.join(matched)}."
-    else:
-        reason = "No strong scam markers detected, but caution is advised."
+    reason = (
+        f"Suspicious markers detected: {', '.join(matched)}."
+        if matched
+        else "No strong scam markers detected, but caution is advised."
+    )
+    if ai_scam.scam_detected:
+        reason = f"{ai_scam.recommendation} ({reason})"
 
     insight = "High-risk phishing pattern detected." if probability >= 75 else "No major phishing trend detected."
     confidence = round(0.5 + min(0.45, probability / 200), 2)
@@ -371,6 +756,7 @@ def analyze_scam(payload: ScamRequest) -> ScamResponse:
         "suspicious_keywords": matched,
         "reason": reason,
         "insight": insight,
+        "ai_scam": ai_scam.model_dump(),
     }
     record = _save_record(
         record_type="scam",
@@ -405,9 +791,7 @@ def get_service_info(service_name: str) -> ServiceInfoResponse:
     if key not in SERVICE_CATALOG:
         key = "aadhaar"
     template = SERVICE_CATALOG[key]
-    readiness = (
-        f"You can start {key.upper()} process after collecting {len(template['documents_required'])} core documents."
-    )
+    readiness = f"You can start the {key.upper()} process after collecting {len(template['documents_required'])} core documents."
     return ServiceInfoResponse(
         service_name=key,
         documents_required=template["documents_required"],
@@ -426,64 +810,95 @@ def service_guidance(payload: ServiceGuidanceRequest) -> Dict[str, Any]:
         category = _detect_service_from_text(payload.text)
 
     info = get_service_info(category)
-    intent = "service"
-    guidance_output = info.model_dump()
-    guidance_output["detected_language"] = language
-    guidance_output["normalized_text"] = normalized
-    guidance_output["intent"] = intent
+    output = info.model_dump()
+    output["detected_language"] = language
+    output["normalized_text"] = normalized
+    output["intent"] = "service"
 
     record_id = _new_id("svc")
     record = _save_record(
         record_type="service",
         raw_input={"text": payload.text, "language": payload.language, "service_category": payload.service_category},
-        processed_output=guidance_output,
+        processed_output=output,
         record_id=record_id,
     )
-    guidance_output["record_id"] = record.id
-    guidance_output["created_at"] = record.created_at.isoformat()
-    return guidance_output
+    output["record_id"] = record.id
+    output["created_at"] = record.created_at.isoformat()
+    return output
 
 
 def route_input(text: str, language: str = "auto", mode: str = "auto") -> Dict[str, Any]:
-    selected_mode = infer_intent(text) if mode == "auto" else mode.lower()
+    selected_mode = _resolve_mode(text) if mode == "auto" else mode.lower()
     if selected_mode == "scam":
         result = analyze_scam(ScamRequest(text=text))
         return {"mode": "scam", "response": result.model_dump()}
     if selected_mode == "service":
-        result = service_guidance(
-            ServiceGuidanceRequest(text=text, language=language, service_category="auto")
-        )
+        result = service_guidance(ServiceGuidanceRequest(text=text, language=language, service_category="auto"))
         return {"mode": "service", "response": result}
-    result = analyze_complaint(
-        ComplaintRequest(text=text, language=language, complaint_mode="general")
-    )
+    result = analyze_complaint(ComplaintRequest(text=text, language=language, complaint_mode="general"))
     return {"mode": "complaint", "response": result.model_dump()}
 
 
 def get_dashboard_data() -> DashboardResponse:
-    complaint_records = [r for r in HISTORY_DB if r.type == "complaint"]
-    scam_records = [r for r in HISTORY_DB if r.type == "scam"]
-    service_records = [r for r in HISTORY_DB if r.type == "service"]
+    complaint_records = [record for record in HISTORY_DB if record.type == "complaint"]
+    scam_records = [record for record in HISTORY_DB if record.type == "scam"]
+    service_records = [record for record in HISTORY_DB if record.type == "service"]
 
-    issue_counter = Counter(r.processed_output.get("issue_type", "Other Issue") for r in complaint_records)
-    location_counter = Counter(r.processed_output.get("location", "Unknown") for r in complaint_records)
-    urgency_counter = Counter(r.processed_output.get("urgency", "Low") for r in complaint_records)
+    issue_counter = Counter(str(record.processed_output.get("issue_type", "General civic issue")) for record in complaint_records)
+    location_counter = Counter(str(record.processed_output.get("location", "Unknown")) for record in complaint_records)
+    priority_counter = Counter(str(record.processed_output.get("priority", "low")).title() for record in complaint_records)
+    department_counter = Counter(str(record.processed_output.get("department", "Local Administration")) for record in complaint_records)
+    complaint_type_counter = Counter(
+        str(record.processed_output.get("complaint_type", "grievance")).replace("_", " ").title()
+        for record in complaint_records
+    )
+    urgency_counter = Counter(str(record.processed_output.get("urgency", "Low")) for record in complaint_records)
 
-    timeline_counter = Counter(r.created_at.date().isoformat() for r in complaint_records)
-    timeline = [{"date": d, "count": c} for d, c in sorted(timeline_counter.items())]
+    timeline_counter = Counter(record.created_at.date().isoformat() for record in complaint_records)
+    priority_timeline: Dict[str, Counter[str]] = defaultdict(Counter)
+    for record in complaint_records:
+        day = record.created_at.date().isoformat()
+        priority_timeline[day][str(record.processed_output.get("priority", "low")).title()] += 1
 
-    clusters = get_cluster_summaries()
+    timeline = [{"date": day, "count": count} for day, count in sorted(timeline_counter.items())]
+    stacked_timeline = [
+        {
+            "date": day,
+            "High": counts.get("High", 0),
+            "Medium": counts.get("Medium", 0),
+            "Low": counts.get("Low", 0),
+        }
+        for day, counts in sorted(priority_timeline.items())
+    ]
+
+    cluster_alerts = [
+        {
+            "cluster_id": cluster.cluster_id,
+            "location": cluster.location,
+            "category": cluster.category,
+            "count": cluster.cluster_size,
+            "priority": cluster.priority.title(),
+            "escalated": cluster.escalated,
+        }
+        for cluster in sorted(get_cluster_summaries(), key=lambda item: item.cluster_size, reverse=True)[:6]
+    ]
+
     return DashboardResponse(
         total_complaints=len(complaint_records),
         most_common_issue=issue_counter.most_common(1)[0][0] if issue_counter else "N/A",
-        high_urgency_count=urgency_counter.get("High", 0) + urgency_counter.get("Critical", 0),
+        high_urgency_count=urgency_counter.get("High", 0),
         complaints_by_type=dict(issue_counter),
         complaints_by_location=dict(location_counter),
+        complaints_by_priority=dict(priority_counter),
+        complaints_by_department=dict(department_counter),
+        complaints_by_complaint_type=dict(complaint_type_counter),
         timeline=timeline,
+        priority_timeline=stacked_timeline,
+        cluster_alerts=cluster_alerts,
         top_area=location_counter.most_common(1)[0][0] if location_counter else "N/A",
         total_scam_checks=len(scam_records),
         total_service_queries=len(service_records),
-        total_clusters=len(clusters),
+        total_clusters=len(get_cluster_summaries()),
     )
 
 
@@ -492,15 +907,15 @@ def get_map_data() -> List[MapPoint]:
     for record in HISTORY_DB:
         if record.type != "complaint":
             continue
-        location = str(record.processed_output.get("location", "Unknown")).lower()
-        lat, lon = LOCATION_COORDS.get(location, LOCATION_COORDS["unknown"])
+        location = str(record.processed_output.get("location", "Unknown"))
+        lat, lon = LOCATION_COORDS.get(location.lower(), LOCATION_COORDS["unknown"])
         points.append(
             MapPoint(
                 lat=lat,
                 lon=lon,
-                issue=str(record.processed_output.get("issue_type", "Other Issue")),
-                location=location.title(),
-                urgency=str(record.processed_output.get("urgency", "Low")),
+                issue=str(record.processed_output.get("issue_type", "General civic issue")),
+                location=location,
+                urgency=str(record.processed_output.get("priority", "low")).title(),
             )
         )
     return points
@@ -518,22 +933,22 @@ def generate_report(record_type: str, record_id: str) -> Optional[ReportResponse
     intent = record.type
 
     processing_steps = [
-        "Received raw user input from frontend.",
+        "Received raw user input from the frontend.",
         "Applied language detection and text normalization rules.",
-        "Executed intent-specific rule-based analysis pipeline.",
-        "Generated structured output with scores and insights.",
-        "Saved record to in-memory demo storage.",
+        "Ran hybrid extraction using LLM hints plus rule-based classification.",
+        "Scored priority using explainable complaint, duration, severity, and clustering rules.",
+        "Saved the structured record in demo in-memory storage.",
     ]
     reasoning_summary = (
-        "The output is generated using deterministic keyword and heuristic rules tuned for hackathon demo reliability."
+        "The complaint pipeline combines LLM-assisted extraction with deterministic category mapping, priority scoring, and area clustering."
     )
     confidence_summary = (
-        "Confidence is estimated from rule coverage (keyword matches, urgency markers, and consistency checks)."
+        "Confidence reflects rule coverage, structured field availability, and consistency across category, duration, and priority signals."
     )
 
     markdown_report = "\n".join(
         [
-            f"# CivicSafe AI Processing Report",
+            "# CivicSafe AI Processing Report",
             "",
             f"- **Record ID:** {record.id}",
             f"- **Record Type:** {record.type}",

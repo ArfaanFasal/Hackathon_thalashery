@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
+from civicsafe_brain import ai_service as brain
 from models import (
+    ChatRequest,
+    ChatResponse,
     ClusterSummary,
     ComplaintRequest,
     ComplaintResponse,
@@ -37,6 +40,9 @@ from services import (
     service_guidance,
 )
 
+from conversation.orchestrator import process_chat_turn
+from conversation.store import init_db, list_messages
+
 
 app = FastAPI(
     title="CivicSafe AI Backend",
@@ -45,10 +51,18 @@ app = FastAPI(
 )
 
 
+@app.on_event("startup")
+def _startup() -> None:
+    init_db()
+
+
 # Enable all origins for hackathon frontend integration.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -62,9 +76,32 @@ async def root() -> Dict[str, str]:
 
 
 @app.get("/health")
-async def health() -> Dict[str, str]:
-    """Simple health-check endpoint."""
-    return {"status": "ok"}
+async def health() -> Dict[str, Any]:
+    """Health check including chat persistence backend."""
+    from conversation.store import storage_backend
+
+    return {
+        "status": "ok",
+        "chat_storage": storage_backend(),
+        "gemini_configured": bool(brain.settings.gemini_api_key),
+        "gemini_model": brain.settings.gemini_model,
+    }
+
+
+@app.post("/api/chat", response_model=ChatResponse)
+async def chat_turn(payload: ChatRequest) -> ChatResponse:
+    """Chat-first civic helpdesk turn (conversational; no raw JSON in assistant_message)."""
+    return process_chat_turn(
+        session_id=payload.session_id,
+        message=payload.message,
+        quick_reply_id=payload.quick_reply_id,
+    )
+
+
+@app.get("/api/chat/{session_id}/history")
+async def chat_history(session_id: str) -> Dict[str, object]:
+    """Recent messages for replay in the UI."""
+    return {"session_id": session_id, "messages": list_messages(session_id)}
 
 
 @app.post("/route-input")
@@ -99,11 +136,28 @@ async def service_guidance_endpoint(payload: ServiceGuidanceRequest) -> Dict[str
 
 @app.post("/voice-to-text", response_model=VoiceResponse)
 async def voice_to_text(file: UploadFile = File(...)) -> VoiceResponse:
-    """Mock speech-to-text conversion endpoint for demo UI."""
-    # No heavy ASR model is used for hackathon practicality.
-    filename = file.filename or "audio_input"
-    converted = f"Mock transcription generated from file: {filename}"
-    return VoiceResponse(converted_text=converted, language="auto")
+    """Transcribe speech with Gemini if available, else return explicit demo mode status."""
+    data = await file.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="Audio file is empty")
+    filename = file.filename or "voice.webm"
+    try:
+        converted = brain.transcribe_bytes(filename, data)
+        return VoiceResponse(
+            converted_text=converted,
+            language="auto",
+            mode="live",
+            provider="gemini",
+            detail="Gemini transcription completed successfully.",
+        )
+    except ValueError as exc:
+        return VoiceResponse(
+            converted_text=f"Demo mode transcription placeholder for {filename}.",
+            language="auto",
+            mode="demo",
+            provider="fallback",
+            detail=str(exc),
+        )
 
 
 @app.get("/dashboard-data", response_model=DashboardResponse)

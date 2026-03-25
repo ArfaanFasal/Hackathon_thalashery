@@ -1,0 +1,14 @@
+# Secrets & local data
+**/.env
+**/data/*.sqlite
+**/data/*.sqlite-journal
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/

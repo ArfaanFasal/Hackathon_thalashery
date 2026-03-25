@@ -1,8 +1,7 @@
-<<<<<<< HEAD
+         HEAD
 import { useMemo, useState } from "react";
-=======
 import { useRef, useState } from "react";
->>>>>>> Ai_Model
+         Ai_Model
 import axios from "axios";
 
 const API_BASE = "http://localhost:8000";
@@ -13,7 +12,7 @@ function App() {
   const [analysis, setAnalysis] = useState(null);
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
-<<<<<<< HEAD
+       HEAD
   const [listening, setListening] = useState(false);
 
   const speechSupported = useMemo(
@@ -44,7 +43,6 @@ function App() {
       setListening(false);
     };
     recognition.start();
-=======
   const [isRecording, setIsRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
 
@@ -192,31 +190,24 @@ function App() {
         rows={6}
         value={rawText}
         onChange={(e) => setRawText(e.target.value)}
-<<<<<<< HEAD
-        placeholder="Type complaint in English, Malayalam, Hindi, or mixed..."
-      />
 
-      <div className="button-row">
-        <button onClick={startMic} disabled={listening}>
-          {listening ? "Listening..." : "Microphone"}
-=======
         placeholder="Type complaint in English, Malayalam, Hindi, or mixed... (or use voice)"
       />
 
       <div className="button-row">
         <button onClick={toggleRecording} disabled={loading || transcribing}>
           {isRecording ? "Stop recording" : "Microphone"}
->>>>>>> Ai_Model
+           Ai_Model
         </button>
         <button onClick={analyze} disabled={loading}>
           {loading ? "Analyzing..." : "Analyze"}
         </button>
       </div>
 
-<<<<<<< HEAD
-=======
+       HEAD
+
       {transcribing && <div className="card">Transcribing audio (multilingual)...</div>}
->>>>>>> Ai_Model
+         Ai_Model
       {loading && <div className="card">Processing request...</div>}
       {error && <div className="error">{error}</div>}
 

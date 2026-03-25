@@ -31,6 +31,13 @@ backend/
 
 ## Setup
 
+Chat storage defaults to SQLite for local development.
+If you want MongoDB-backed chat persistence, set:
+
+```bash
+CHAT_STORAGE=mongodb
+```
+
 ### 1) Create virtual environment
 
 ```bash
@@ -64,6 +71,14 @@ uvicorn main:app --reload
 ```
 
 Backend runs at: `http://127.0.0.1:8000`
+
+Windows / Python 3.14 note:
+
+If `--reload` fails with `PermissionError: [WinError 5] Access is denied`, run without reload instead:
+
+```bash
+python run_server.py
+```
 
 Interactive docs:
 - Swagger UI: `http://127.0.0.1:8000/docs`
