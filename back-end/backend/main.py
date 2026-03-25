@@ -2,6 +2,13 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Load .env before any module that reads OPENAI_API_KEY (avoids empty key if import order changes).
+load_dotenv(Path(__file__).resolve().parent / ".env")
+
 from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
@@ -30,12 +37,14 @@ from services import (
     analyze_complaint,
     analyze_scam,
     generate_report,
+    get_allocation_tree,
     get_cluster_summaries,
     get_dashboard_data,
     get_history,
     get_map_data,
     get_record_by_id,
     get_service_info,
+    load_persistent_records,
     route_input,
     service_guidance,
 )
@@ -54,6 +63,7 @@ app = FastAPI(
 @app.on_event("startup")
 def _startup() -> None:
     init_db()
+    load_persistent_records()
 
 
 # Enable all origins for hackathon frontend integration.
@@ -83,8 +93,8 @@ async def health() -> Dict[str, Any]:
     return {
         "status": "ok",
         "chat_storage": storage_backend(),
-        "gemini_configured": bool(brain.settings.gemini_api_key),
-        "gemini_model": brain.settings.gemini_model,
+        "openai_configured": bool(brain.settings.openai_api_key),
+        "openai_model": brain.settings.openai_model,
     }
 
 
@@ -136,27 +146,32 @@ async def service_guidance_endpoint(payload: ServiceGuidanceRequest) -> Dict[str
 
 @app.post("/voice-to-text", response_model=VoiceResponse)
 async def voice_to_text(file: UploadFile = File(...)) -> VoiceResponse:
-    """Transcribe speech with Gemini if available, else return explicit demo mode status."""
+    """Transcribe speech with OpenAI (Whisper + English pass) if available, else demo mode."""
     data = await file.read()
     if not data:
         raise HTTPException(status_code=400, detail="Audio file is empty")
     filename = file.filename or "voice.webm"
     try:
-        converted = brain.transcribe_bytes(filename, data)
+        converted, whisper_lang = brain.transcribe_bytes_with_language(filename, data)
         return VoiceResponse(
             converted_text=converted,
-            language="auto",
+            language=whisper_lang or "auto",
             mode="live",
-            provider="gemini",
-            detail="Gemini transcription completed successfully.",
+            provider="openai-whisper",
+            detail="Whisper transcription completed (multilingual). Text may be translated to English if TRANSCRIBE_TRANSLATE=1.",
+            detected_language=whisper_lang,
         )
-    except ValueError as exc:
+    except Exception as exc:
+        err = str(exc)
         return VoiceResponse(
-            converted_text=f"Demo mode transcription placeholder for {filename}.",
+            converted_text="",
             language="auto",
             mode="demo",
             provider="fallback",
-            detail=str(exc),
+            detail=(
+                "Transcription failed. Set OPENAI_API_KEY in back-end/backend/.env and restart the API server. "
+                f"({err})"
+            ),
         )
 
 
@@ -187,10 +202,16 @@ async def generate_report_endpoint(payload: ReportRequest) -> ReportResponse:
     return report
 
 
+@app.get("/allocation-tree")
+async def allocation_tree() -> Dict[str, Any]:
+    """Complaints vs requests grouped by taxonomy domain (folder-style navigation)."""
+    return get_allocation_tree()
+
+
 @app.get("/history", response_model=list[HistoryRecord])
 async def history(record_type: Optional[str] = Query(default=None, alias="type")) -> list[HistoryRecord]:
-    """List saved records; optionally filter by complaint/scam/service."""
-    if record_type and record_type not in {"complaint", "scam", "service"}:
+    """List saved records; optionally filter by complaint/scam/service/request."""
+    if record_type and record_type not in {"complaint", "scam", "service", "request"}:
         raise HTTPException(status_code=400, detail="Invalid type filter")
     return get_history(record_type=record_type)
 

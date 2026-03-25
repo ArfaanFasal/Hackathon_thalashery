@@ -2,31 +2,41 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BarChart3,
+  Building2,
+  FolderTree,
   LayoutDashboard,
   MessageCircle,
+  Network,
   Search,
   Shield,
   Bell,
   X,
   Home,
-  HeartPulse,
-  LifeBuoy,
+  User,
 } from 'lucide-react'
 import { ChatAssistant } from './components/ChatAssistant'
 import { DashboardHome } from './components/DashboardHome'
 import { AnalyticsView } from './components/AnalyticsView'
+import { AllocationExplorer } from './components/AllocationExplorer'
+import { ForwardedNetwork } from './components/ForwardedNetwork'
+import { CitizenPage, DepartmentPage, AdminPage } from './components/StakeholderPages'
 import { LandingHero } from './components/LandingHero'
 import { API_BASE } from './lib/api'
 
 const nav = [
   { id: 'chat', label: 'Assistant', icon: MessageCircle },
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'analytics', label: 'Hotspots', icon: BarChart3 },
+  { id: 'allocation', label: 'Allocation', icon: FolderTree },
+  { id: 'forwarded', label: 'Forwarded', icon: Network },
+  { id: 'analytics', label: 'Map', icon: BarChart3 },
+  { id: 'citizen', label: 'Citizen', icon: User },
+  { id: 'department', label: 'Department', icon: Building2 },
+  { id: 'admin', label: 'Admin', icon: Shield },
 ]
 
 const sampleNotifications = [
   { id: 1, title: 'High-urgency complaint pattern', body: 'Review water shortage cases in the last session.', time: 'Just now' },
-  { id: 2, title: 'Voice STT ready', body: 'Malayalam recordings are translated to English when Gemini is configured.', time: '2m ago' },
+  { id: 2, title: 'Voice STT ready', body: 'Malayalam recordings are translated to English when OpenAI is configured.', time: '2m ago' },
   { id: 3, title: 'MongoDB sync', body: 'Chat history persists when MONGODB_URI is set.', time: '5m ago' },
 ]
 
@@ -97,7 +107,7 @@ export default function App() {
         <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-indigo-600 shadow-glow">
           <Shield className="h-6 w-6 text-white" />
         </div>
-        <nav className="flex flex-1 flex-col gap-4">
+        <nav className="flex flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden py-1">
           {nav.map((item) => {
             const Icon = item.icon
             const active = view === item.id
@@ -121,22 +131,6 @@ export default function App() {
             )
           })}
         </nav>
-        <div className="mt-auto flex flex-col gap-3 pb-2">
-          <button
-            type="button"
-            title="Support"
-            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-transparent text-slate-500 hover:border-white/10 hover:bg-white/5 hover:text-rose-300"
-          >
-            <LifeBuoy className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            title="Health"
-            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-transparent text-slate-500 hover:border-white/10 hover:bg-white/5 hover:text-emerald-300"
-          >
-            <HeartPulse className="h-5 w-5" />
-          </button>
-        </div>
       </aside>
 
       <div className="flex min-h-screen flex-1 flex-col pl-[4.5rem] sm:pl-20">
@@ -171,12 +165,15 @@ export default function App() {
             {health ? (
               <span
                 className={`hidden rounded-full px-2 py-0.5 text-[10px] font-medium uppercase sm:inline ${
-                  health.gemini_configured
+                  (health.openai_configured ?? health.gemini_configured)
                     ? 'border border-cyan-500/30 bg-cyan-500/10 text-cyan-200'
                     : 'border border-amber-500/30 bg-amber-500/10 text-amber-200'
                 }`}
               >
-                STT: {health.gemini_configured ? `Gemini ${health.gemini_model}` : 'Demo mode'}
+                STT:{' '}
+                {(health.openai_configured ?? health.gemini_configured)
+                  ? `OpenAI ${health.openai_model ?? health.gemini_model}`
+                  : 'Demo mode'}
               </span>
             ) : null}
             <div className="relative" ref={notifRef}>
@@ -233,7 +230,12 @@ export default function App() {
           >
             {view === 'chat' ? <ChatAssistant /> : null}
             {view === 'dashboard' ? <DashboardHome /> : null}
+            {view === 'allocation' ? <AllocationExplorer /> : null}
+            {view === 'forwarded' ? <ForwardedNetwork /> : null}
             {view === 'analytics' ? <AnalyticsView /> : null}
+            {view === 'citizen' ? <CitizenPage onOpenChat={() => setView('chat')} /> : null}
+            {view === 'department' ? <DepartmentPage /> : null}
+            {view === 'admin' ? <AdminPage /> : null}
           </motion.div>
         </main>
       </div>

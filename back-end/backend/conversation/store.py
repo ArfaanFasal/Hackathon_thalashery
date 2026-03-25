@@ -96,6 +96,7 @@ def _default_state() -> Dict[str, Any]:
         "item_id": None,
         "item_kind": None,
         "slots": {"description": "", "location": "", "urgency": "", "since_when": ""},
+        "chat_mode": "free",  # free = conversational OpenAI first; civic = structured routing
     }
 
 

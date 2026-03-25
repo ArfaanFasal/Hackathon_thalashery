@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import uuid
 from collections import Counter, defaultdict
@@ -10,6 +11,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 from civicsafe_brain import ai_service as brain
+from civicsafe_records.store import fetch_all_records, init_records_db, persist_record
+from taxonomy import get_item_detail
 from models import (
     ClusterSummary,
     ComplaintRequest,
@@ -72,6 +75,69 @@ SERVICE_CATALOG: Dict[str, Dict[str, Any]] = {
         ],
         "official_website": "https://www.rbi.org.in",
         "support_channel": "Contact a verified bank branch only",
+    },
+    "water_connection": {
+        "documents_required": ["Identity proof", "Address proof", "Property tax receipt or ownership proof", "Passport photos"],
+        "steps": [
+            "Visit your municipal corporation / water authority office or its online portal.",
+            "Submit the new water connection application with site address and plot details.",
+            "Pay prescribed fees and schedule inspection if required.",
+            "Track application status with the acknowledgement number.",
+        ],
+        "official_website": "https://kerala.gov.in",
+        "support_channel": "Local body water wing / KWA helpline (verify on official site)",
+    },
+    "electricity_connection": {
+        "documents_required": ["Identity proof", "Address proof", "Wiring completion certificate (if applicable)", "Load sanction documents"],
+        "steps": [
+            "Apply via the state electricity board (e.g. KSEB) online portal or section office.",
+            "Submit load details, wiring safety certificate, and identity/address proof.",
+            "Pay security deposit and charges as per tariff.",
+            "Meter installation is scheduled after technical approval.",
+        ],
+        "official_website": "https://www.kseb.in",
+        "support_channel": "KSEB customer care (verify current number on official portal)",
+    },
+    "waste_management": {
+        "documents_required": ["Address proof", "Property ID / tax number if required locally"],
+        "steps": [
+            "Register with the municipal sanitation / solid waste management desk.",
+            "Choose door-to-door collection or community bin service per local rules.",
+            "Pay user charges if applicable.",
+        ],
+        "official_website": "https://kerala.gov.in",
+        "support_channel": "Municipal health / sanitation department",
+    },
+    "property_tax": {
+        "documents_required": ["Property document", "Previous tax receipt if any", "Identity proof"],
+        "steps": [
+            "Log in to the local body revenue portal or visit the tax counter.",
+            "Verify assessment details and pay online or at the office.",
+            "Save the receipt for records.",
+        ],
+        "official_website": "https://kerala.gov.in",
+        "support_channel": "Municipal revenue / tax section",
+    },
+    "sewage_connection": {
+        "documents_required": ["Building plan approval", "Address proof", "NOC as per local rules"],
+        "steps": [
+            "Apply to municipal engineering / sewerage department.",
+            "Submit site plan and connection fee payment.",
+            "Coordinate inspection and connection date.",
+        ],
+        "official_website": "https://kerala.gov.in",
+        "support_channel": "Municipal engineering department",
+    },
+    "generic_civic_service": {
+        "documents_required": ["Valid photo ID", "Address proof", "Passport-size photos", "Supporting documents listed on the official portal"],
+        "steps": [
+            "Open the official department or e-district portal for this service.",
+            "Check eligibility and the latest document checklist.",
+            "Apply online or at the authorised centre and keep the acknowledgement number.",
+            "Follow up only through official channels.",
+        ],
+        "official_website": "https://www.india.gov.in",
+        "support_channel": "Department helpline listed on the official portal",
     },
 }
 
@@ -464,7 +530,25 @@ def _urgency_from_priority(priority: str, severity_keywords: List[str]) -> str:
     return "Low"
 
 
-def _save_record(record_type: str, raw_input: Dict[str, Any], processed_output: Dict[str, Any], record_id: str) -> HistoryRecord:
+def _allocation_bucket(record_type: str) -> str:
+    if record_type == "complaint":
+        return "complaints"
+    if record_type in ("request", "service"):
+        return "requests"
+    return "scam"
+
+
+def _save_record(
+    record_type: str,
+    raw_input: Dict[str, Any],
+    processed_output: Dict[str, Any],
+    record_id: str,
+    *,
+    domain_id: Optional[str] = None,
+    domain_title: Optional[str] = None,
+    item_id: Optional[str] = None,
+    item_title: Optional[str] = None,
+) -> HistoryRecord:
     record = HistoryRecord(
         id=record_id,
         type=record_type,  # type: ignore[arg-type]
@@ -473,7 +557,43 @@ def _save_record(record_type: str, raw_input: Dict[str, Any], processed_output: 
         processed_output=processed_output,
     )
     HISTORY_DB.append(record)
+    bucket = _allocation_bucket(record_type)
+    try:
+        persist_record(
+            record_id,
+            record_type,
+            record.created_at,
+            raw_input,
+            processed_output,
+            allocation_bucket=bucket,
+            domain_id=domain_id,
+            domain_title=domain_title,
+            item_id=item_id,
+            item_title=item_title,
+        )
+    except Exception:
+        pass
     return record
+
+
+def load_persistent_records() -> None:
+    """Load SQLite civic records into in-memory HISTORY_DB (server startup)."""
+    global HISTORY_DB
+    init_records_db()
+    rows = fetch_all_records()
+    if not rows:
+        return
+    HISTORY_DB.clear()
+    for row in rows:
+        HISTORY_DB.append(
+            HistoryRecord(
+                id=row["id"],
+                type=row["type"],  # type: ignore[arg-type]
+                created_at=datetime.fromisoformat(row["created_at"]),
+                raw_input=json.loads(row["raw_json"]),
+                processed_output=json.loads(row["processed_json"]),
+            )
+        )
 
 
 def get_history(record_type: Optional[str] = None) -> List[HistoryRecord]:
@@ -674,6 +794,19 @@ def analyze_complaint(payload: ComplaintRequest) -> ComplaintResponse:
         "citizen_message": citizen_message,
         "ai_summary": ai_structured.summary,
     }
+    if payload.taxonomy_domain_id:
+        structured_output["taxonomy_domain_id"] = payload.taxonomy_domain_id
+    if payload.taxonomy_item_id:
+        structured_output["taxonomy_item_id"] = payload.taxonomy_item_id
+    if payload.taxonomy_domain_title:
+        structured_output["taxonomy_domain_title"] = payload.taxonomy_domain_title
+    if payload.taxonomy_item_title:
+        structured_output["taxonomy_item_title"] = payload.taxonomy_item_title
+
+    dom_id = payload.taxonomy_domain_id or category
+    dom_title = payload.taxonomy_domain_title
+    item_id = payload.taxonomy_item_id
+    item_title = payload.taxonomy_item_title
 
     record = _save_record(
         record_type="complaint",
@@ -685,6 +818,10 @@ def analyze_complaint(payload: ComplaintRequest) -> ComplaintResponse:
             **structured_output,
         },
         record_id=record_id,
+        domain_id=dom_id,
+        domain_title=dom_title,
+        item_id=item_id,
+        item_title=item_title,
     )
 
     return ComplaintResponse(
@@ -763,6 +900,10 @@ def analyze_scam(payload: ScamRequest) -> ScamResponse:
         raw_input={"text": payload.text, "url": payload.url},
         processed_output=structured_output,
         record_id=record_id,
+        domain_id=None,
+        domain_title=None,
+        item_id=None,
+        item_title=None,
     )
 
     return ScamResponse(
@@ -786,10 +927,10 @@ def _detect_service_from_text(text: str) -> str:
     return "aadhaar"
 
 
-def get_service_info(service_name: str) -> ServiceInfoResponse:
+def get_service_info(service_name: str, *, fallback: str = "aadhaar") -> ServiceInfoResponse:
     key = service_name.lower()
     if key not in SERVICE_CATALOG:
-        key = "aadhaar"
+        key = fallback
     template = SERVICE_CATALOG[key]
     readiness = f"You can start the {key.upper()} process after collecting {len(template['documents_required'])} core documents."
     return ServiceInfoResponse(
@@ -806,21 +947,60 @@ def service_guidance(payload: ServiceGuidanceRequest) -> Dict[str, Any]:
     language = detect_language(payload.text) if payload.language == "auto" else payload.language
     normalized = normalize_hinglish(payload.text)
     category = payload.service_category.lower()
-    if category == "auto":
+    taxonomy_item_title: Optional[str] = payload.taxonomy_item_title
+    taxonomy_domain_title: Optional[str] = payload.taxonomy_domain_title
+
+    if payload.taxonomy_item_id:
+        cat_key = payload.taxonomy_item_id if payload.taxonomy_item_id in SERVICE_CATALOG else "generic_civic_service"
+        detail = None
+        if payload.taxonomy_domain_id:
+            detail = get_item_detail(payload.taxonomy_domain_id, payload.taxonomy_item_id)
+        if detail:
+            _, it, _ = detail
+            taxonomy_item_title = taxonomy_item_title or it.get("title")
+            dom, _, _ = detail
+            taxonomy_domain_title = taxonomy_domain_title or dom.get("title")
+        category = cat_key
+    elif category == "auto":
         category = _detect_service_from_text(payload.text)
 
-    info = get_service_info(category)
+    fb = "generic_civic_service" if payload.taxonomy_item_id else "aadhaar"
+    info = get_service_info(category, fallback=fb)
     output = info.model_dump()
+    output["service_name"] = taxonomy_item_title or output.get("service_name", category)
+    if category == "generic_civic_service" and taxonomy_item_title:
+        output["readiness_summary"] = (
+            f"You can start the {taxonomy_item_title} process after collecting the listed documents and checking the official portal."
+        )
     output["detected_language"] = language
     output["normalized_text"] = normalized
-    output["intent"] = "service"
+    output["intent"] = "request" if payload.taxonomy_item_id else "service"
+    if payload.taxonomy_domain_id:
+        output["taxonomy_domain_id"] = payload.taxonomy_domain_id
+    if payload.taxonomy_item_id:
+        output["taxonomy_item_id"] = payload.taxonomy_item_id
+    if taxonomy_domain_title:
+        output["taxonomy_domain_title"] = taxonomy_domain_title
+    if taxonomy_item_title:
+        output["taxonomy_item_title"] = taxonomy_item_title
 
-    record_id = _new_id("svc")
+    save_type = "request" if payload.taxonomy_item_id else "service"
+    record_id = _new_id("req" if save_type == "request" else "svc")
     record = _save_record(
-        record_type="service",
-        raw_input={"text": payload.text, "language": payload.language, "service_category": payload.service_category},
+        save_type,
+        raw_input={
+            "text": payload.text,
+            "language": payload.language,
+            "service_category": payload.service_category,
+            "taxonomy_domain_id": payload.taxonomy_domain_id,
+            "taxonomy_item_id": payload.taxonomy_item_id,
+        },
         processed_output=output,
         record_id=record_id,
+        domain_id=payload.taxonomy_domain_id,
+        domain_title=taxonomy_domain_title,
+        item_id=payload.taxonomy_item_id,
+        item_title=taxonomy_item_title,
     )
     output["record_id"] = record.id
     output["created_at"] = record.created_at.isoformat()
@@ -843,6 +1023,7 @@ def get_dashboard_data() -> DashboardResponse:
     complaint_records = [record for record in HISTORY_DB if record.type == "complaint"]
     scam_records = [record for record in HISTORY_DB if record.type == "scam"]
     service_records = [record for record in HISTORY_DB if record.type == "service"]
+    request_records = [record for record in HISTORY_DB if record.type in ("request", "service")]
 
     issue_counter = Counter(str(record.processed_output.get("issue_type", "General civic issue")) for record in complaint_records)
     location_counter = Counter(str(record.processed_output.get("location", "Unknown")) for record in complaint_records)
@@ -898,8 +1079,88 @@ def get_dashboard_data() -> DashboardResponse:
         top_area=location_counter.most_common(1)[0][0] if location_counter else "N/A",
         total_scam_checks=len(scam_records),
         total_service_queries=len(service_records),
+        total_requests=len(request_records),
         total_clusters=len(get_cluster_summaries()),
     )
+
+
+def get_allocation_tree() -> Dict[str, Any]:
+    """Folder-style grouping: complaints vs requests → department → records."""
+    complaints: Dict[str, List[Dict[str, Any]]] = {}
+    requests: Dict[str, List[Dict[str, Any]]] = {}
+
+    def _status_meta(record: HistoryRecord) -> Tuple[str, str]:
+        po = record.processed_output
+        txt = f"{record.raw_input.get('text', '')} {po.get('status', '')}".lower()
+        if any(x in txt for x in ("completed", "resolved", "fixed", "done", "closed")):
+            return "completed", "check-circle"
+        if record.type == "scam":
+            return "completed", "check-circle"
+        if po.get("escalated") or "escalate" in str(po.get("action", "")):
+            return "in_progress", "loader"
+        if po.get("priority") == "high":
+            return "in_progress", "loader"
+        return "pending", "clock"
+
+    def _request_department(po: Dict[str, Any]) -> str:
+        explicit = str(po.get("department") or "").strip()
+        if explicit:
+            return explicit
+        item = str(po.get("taxonomy_item_title") or po.get("service_name") or "").lower()
+        if any(k in item for k in ("electric", "kseb", "power")):
+            return "Electricity Department / KSEB"
+        if any(k in item for k in ("water", "sewage", "drain")):
+            return "Water Authority / Municipal Engineering"
+        if any(k in item for k in ("passport",)):
+            return "Passport Seva"
+        if any(k in item for k in ("aadhaar",)):
+            return "UIDAI Services"
+        if any(k in item for k in ("pan",)):
+            return "Income Tax / PAN Services"
+        if any(k in item for k in ("driving", "licence", "license", "dl")):
+            return "Motor Vehicles Department"
+        if any(k in item for k in ("health", "hospital")):
+            return "Health Department"
+        return "Citizen Service Center"
+
+    for record in HISTORY_DB:
+        po = record.processed_output
+        if record.type == "complaint":
+            dept = str(po.get("department") or "Local Administration")
+            status, icon = _status_meta(record)
+            complaints.setdefault(dept, []).append(
+                {
+                    "id": record.id,
+                    "type": record.type,
+                    "created_at": record.created_at.isoformat(),
+                    "department": dept,
+                    "domain_title": str(po.get("taxonomy_domain_title") or po.get("category") or "general"),
+                    "item_title": po.get("taxonomy_item_title") or po.get("issue_type"),
+                    "summary": po.get("citizen_message") or po.get("issue_type") or "",
+                    "location": po.get("location"),
+                    "priority": po.get("priority"),
+                    "status": status,
+                    "status_icon": icon,
+                }
+            )
+        elif record.type in ("request", "service"):
+            dept = _request_department(po)
+            status, icon = _status_meta(record)
+            requests.setdefault(dept, []).append(
+                {
+                    "id": record.id,
+                    "type": record.type,
+                    "created_at": record.created_at.isoformat(),
+                    "department": dept,
+                    "domain_title": str(po.get("taxonomy_domain_title") or "Service requests"),
+                    "item_title": po.get("taxonomy_item_title") or po.get("service_name"),
+                    "summary": po.get("readiness_summary") or "",
+                    "status": status,
+                    "status_icon": icon,
+                }
+            )
+
+    return {"complaints": complaints, "requests": requests}
 
 
 def get_map_data() -> List[MapPoint]:

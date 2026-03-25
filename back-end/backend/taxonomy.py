@@ -37,16 +37,70 @@ CIVIC_DOMAINS: List[Dict[str, Any]] = [
         "id": "utilities_municipal",
         "title": "Utilities & Municipal Services",
         "services": [
-            {"id": "water_connection", "title": "Water connection", "keywords": ["new water connection", "water supply connection"]},
-            {"id": "electricity_connection", "title": "Electricity connection", "keywords": ["new electricity connection", "power connection"]},
+            {
+                "id": "water_connection",
+                "title": "Water connection",
+                "keywords": [
+                    "new water connection",
+                    "water supply connection",
+                    "water connection",
+                    "apply for water",
+                    "water meter",
+                    "new water supply",
+                    "connection for water",
+                    "house water connection",
+                ],
+            },
+            {
+                "id": "electricity_connection",
+                "title": "Electricity connection",
+                "keywords": [
+                    "new electricity connection",
+                    "electricity connection",
+                    "power connection",
+                    "apply electricity",
+                    "kseb connection",
+                    "bijli connection",
+                    "new meter",
+                    "electricity meter",
+                ],
+            },
             {"id": "waste_management", "title": "Waste management services", "keywords": ["waste pickup", "door to door garbage"]},
             {"id": "property_tax", "title": "Property tax payment", "keywords": ["property tax", "house tax pay"]},
             {"id": "sewage_connection", "title": "Sewage connection", "keywords": ["sewage", "drainage connection"]},
         ],
         "complaints": [
-            {"id": "water_shortage", "title": "Water shortage", "keywords": ["no water", "water shortage", "pani nahi"]},
-            {"id": "water_leak", "title": "Water leakage", "keywords": ["water leak", "pipeline leak"]},
-            {"id": "power_cut", "title": "Power cut / outage", "keywords": ["power cut", "electricity gone", "blackout"]},
+            {
+                "id": "water_shortage",
+                "title": "Water shortage",
+                "keywords": [
+                    "no water",
+                    "water shortage",
+                    "pani nahi",
+                    "water not coming",
+                    "supply stopped",
+                    "no supply",
+                    "water supply issue",
+                    "water supply problem",
+                    "water issue",
+                ],
+            },
+            {"id": "water_leak", "title": "Water leakage", "keywords": ["water leak", "pipeline leak", "water pipe"]},
+            {
+                "id": "power_cut",
+                "title": "Power cut / outage",
+                "keywords": [
+                    "power cut",
+                    "electricity gone",
+                    "blackout",
+                    "no electricity",
+                    "no power",
+                    "current gone",
+                    "bijli nahi",
+                    "electricity issue",
+                    "power issue",
+                ],
+            },
             {"id": "streetlight", "title": "Streetlight not working", "keywords": ["streetlight", "street light", "lamp post"]},
             {"id": "garbage_not_collected", "title": "Garbage not collected", "keywords": ["garbage not collected", "waste not picked"]},
             {"id": "drain_block", "title": "Drain blockage", "keywords": ["drain blocked", "sewage overflow"]},
@@ -172,6 +226,11 @@ COMPLIANCE_DISCLAIMER = (
 )
 
 
+def uses_service_items(parent: str) -> bool:
+    """Application / permit path uses the same item lists as legacy 'service' parent."""
+    return parent in ("service", "request")
+
+
 def domain_by_id(domain_id: str) -> Optional[Dict[str, Any]]:
     for d in CIVIC_DOMAINS:
         if d["id"] == domain_id:
@@ -186,7 +245,7 @@ def find_best_domain_item(
     lowered = text.lower()
     best: Tuple[float, Optional[Dict[str, Any]], Optional[Dict[str, Any]], str] = (0.0, None, None, "service")
     for dom in CIVIC_DOMAINS:
-        if parent == "service":
+        if uses_service_items(parent):
             items = dom["services"]
             kind = "service"
         else:
@@ -204,7 +263,7 @@ def find_best_domain_item(
 def list_domains_for_parent(parent: str) -> List[Dict[str, str]]:
     out = []
     for dom in CIVIC_DOMAINS:
-        if parent == "service" and dom["services"]:
+        if uses_service_items(parent) and dom["services"]:
             out.append({"id": dom["id"], "title": dom["title"]})
         if parent == "complaint" and dom["complaints"]:
             out.append({"id": dom["id"], "title": dom["title"]})
@@ -215,7 +274,7 @@ def list_items(domain_id: str, parent: str) -> List[Dict[str, str]]:
     dom = domain_by_id(domain_id)
     if not dom:
         return []
-    key = "services" if parent == "service" else "complaints"
+    key = "services" if uses_service_items(parent) else "complaints"
     return [{"id": x["id"], "title": x["title"]} for x in dom.get(key, [])]
 
 

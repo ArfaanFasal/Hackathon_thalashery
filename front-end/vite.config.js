@@ -16,6 +16,7 @@ const backendRoutes = [
   '/clusters',
   '/generate-report',
   '/history',
+  '/allocation-tree',
 ]
 
 // https://vite.dev/config/

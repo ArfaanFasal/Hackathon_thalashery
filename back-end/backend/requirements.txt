@@ -4,5 +4,5 @@ pydantic
 python-multipart
 requests
 python-dotenv
-google-genai
+openai>=1.0.0
 pymongo

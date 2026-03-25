@@ -1,11 +1,24 @@
 const API_BASE = (import.meta.env.VITE_API_BASE || '').replace(/\/$/, '')
 
 async function readJsonOrThrow(res, fallbackMessage) {
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err.detail || fallbackMessage || res.statusText)
+  const ct = (res.headers.get('content-type') || '').toLowerCase()
+  if (ct.includes('application/json')) {
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      throw new Error(data.detail || fallbackMessage || res.statusText)
+    }
+    return data
   }
-  return res.json()
+  const text = await res.text()
+  if (text.trimStart().toLowerCase().startsWith('<!')) {
+    throw new Error(
+      'API returned HTML instead of JSON (wrong URL or missing Vite proxy). Restart the dev server after vite.config.js changes; or set VITE_API_BASE to your FastAPI URL (e.g. http://127.0.0.1:8000).'
+    )
+  }
+  if (!res.ok) {
+    throw new Error(fallbackMessage || res.statusText)
+  }
+  throw new Error(fallbackMessage || 'Expected JSON from API')
 }
 
 export async function sendChat({ sessionId, message, quickReplyId }) {
@@ -28,7 +41,7 @@ export async function transcribeVoice(file) {
   return readJsonOrThrow(res, 'Transcription failed')
 }
 
-/** Recorded in-browser audio (e.g. MediaRecorder webm). Malayalam etc. → English on server when Gemini is configured. */
+/** Recorded in-browser audio (e.g. MediaRecorder webm). Malayalam etc. → English on server when OpenAI is configured. */
 export async function transcribeVoiceBlob(blob, filename = 'recording.webm') {
   const file = new File([blob], filename, { type: blob.type || 'audio/webm' })
   return transcribeVoice(file)
@@ -41,6 +54,11 @@ export async function fetchDashboard() {
     fetch(`${API_BASE}/history`).then((r) => readJsonOrThrow(r, 'History request failed')),
   ])
   return { dashboard: d, mapPoints: m, history }
+}
+
+export async function fetchAllocationTree() {
+  const res = await fetch(`${API_BASE}/allocation-tree`)
+  return readJsonOrThrow(res, 'Allocation tree failed')
 }
 
 export { API_BASE }

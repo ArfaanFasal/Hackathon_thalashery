@@ -16,6 +16,7 @@ export function ChatAssistant() {
   const mediaRecorderRef = useRef(null)
   const chunksRef = useRef([])
   const streamRef = useRef(null)
+  const speechRecRef = useRef(null)
 
   const pushAssistant = useCallback((payload) => {
     setMessages((m) => [
@@ -28,6 +29,10 @@ export function ChatAssistant() {
         scam: payload.scam_banner,
         caseComplete: payload.case_complete,
         stage: payload.stage,
+        chatMode: payload.chat_mode || 'free',
+        chatSignals: payload.chat_signals || null,
+        intentStatus: payload.chat_mode === 'civic' ? payload.frontend_status || null : null,
+        intentAnalysis: payload.chat_mode === 'civic' ? payload.intent_analysis || null : null,
       },
     ])
   }, [])
@@ -55,6 +60,11 @@ export function ChatAssistant() {
 
   useEffect(() => () => {
     streamRef.current?.getTracks().forEach((track) => track.stop())
+    if (speechRecRef.current) {
+      try {
+        speechRecRef.current.stop()
+      } catch {}
+    }
   }, [])
 
   const runTurn = async ({ message, quickReplyId }) => {
@@ -75,13 +85,21 @@ export function ChatAssistant() {
   }
 
   const handleTranscriptionResult = (result) => {
-    const text = result?.converted_text || ''
-    setInput((prev) => (prev ? `${prev} ${text}` : text).trim())
+    const text = (result?.converted_text || '').trim()
+    if (text) {
+      setInput((prev) => (prev ? `${prev} ${text}` : text).trim())
+    }
+    const lang = (result?.detected_language || result?.language || '').trim()
+    const langNote =
+      result?.mode === 'live' && lang
+        ? ` Detected speech language (Whisper): ${lang}.`
+        : ''
     setVoiceStatus({
       tone: result?.mode === 'live' ? 'ok' : 'warn',
-      text: result?.mode === 'live'
-        ? 'Live Gemini transcription completed.'
-        : result?.detail || 'Demo transcription mode is active.',
+      text:
+        result?.mode === 'live'
+          ? `Voice transcribed with Whisper (multilingual).${langNote} Edit below before sending.`
+          : result?.detail || 'Voice could not be transcribed. Set OPENAI_API_KEY and restart the API.',
     })
   }
 
@@ -93,6 +111,42 @@ export function ChatAssistant() {
 
   const startRecording = async () => {
     if (recording || voiceBusy) return
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (SpeechRecognition) {
+      try {
+        const rec = new SpeechRecognition()
+        speechRecRef.current = rec
+        rec.lang = 'en-IN'
+        rec.continuous = false
+        rec.interimResults = false
+        rec.onresult = (event) => {
+          const transcript = event?.results?.[0]?.[0]?.transcript?.trim()
+          if (transcript) {
+            setInput((prev) => (prev ? `${prev} ${transcript}` : transcript).trim())
+            setVoiceStatus({
+              tone: 'ok',
+              text: 'Voice transcribed using browser speech recognition. Edit text before sending.',
+            })
+          }
+        }
+        rec.onerror = () => {
+          setVoiceStatus({
+            tone: 'warn',
+            text: 'Browser speech recognition failed; trying server transcription fallback.',
+          })
+        }
+        rec.onend = () => {
+          setRecording(false)
+          speechRecRef.current = null
+        }
+        setVoiceStatus(null)
+        rec.start()
+        setRecording(true)
+        return
+      } catch {
+        // Fall through to MediaRecorder + backend.
+      }
+    }
     try {
       setVoiceStatus(null)
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -132,6 +186,15 @@ export function ChatAssistant() {
   }
 
   const stopRecording = () => {
+    const speech = speechRecRef.current
+    if (speech) {
+      try {
+        speech.stop()
+      } catch {}
+      speechRecRef.current = null
+      setRecording(false)
+      return
+    }
     const recorder = mediaRecorderRef.current
     if (recorder && recorder.state !== 'inactive') {
       recorder.stop()
@@ -159,12 +222,13 @@ export function ChatAssistant() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="glass-panel mb-4 flex shrink-0 items-center justify-between rounded-2xl px-5 py-4">
+      <div className="glass-panel mb-4 flex shrink-0 flex-col gap-3 rounded-2xl border border-white/[0.07] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-widest text-emerald-300/90">Assistant</p>
-          <h2 className="text-lg font-semibold text-white">Natural conversation and complaint intelligence</h2>
+          <h2 className="text-lg font-semibold text-white">Complaints, requests, and voice in many languages</h2>
           <p className="text-sm text-slate-400">
-            Speak naturally and the backend will extract issue, category, department, duration, priority, and cluster signals.
+            Outages and faults are logged as complaints; new connections and applications as requests. Mic uses OpenAI Whisper—set{' '}
+            <span className="font-mono text-[11px] text-slate-500">TRANSCRIBE_TRANSLATE=1</span> in the backend to normalize to English.
           </p>
           {voiceStatus ? (
             <p className={`mt-2 text-xs ${voiceStatus.tone === 'ok' ? 'text-emerald-300' : voiceStatus.tone === 'error' ? 'text-rose-300' : 'text-amber-300'}`}>
@@ -188,6 +252,69 @@ export function ChatAssistant() {
                   }`}
                 >
                   {msg.role === 'user' ? msg.text : <RichText text={msg.text} />}
+                  {msg.chatMode === 'civic' && msg.intentStatus && msg.role === 'assistant' ? (
+                    <div className="mt-4 rounded-xl border border-cyan-500/25 bg-gradient-to-br from-cyan-950/40 to-indigo-950/30 p-4 text-left">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-cyan-300/90">Case status</p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[11px] font-medium text-slate-200">
+                          {msg.intentStatus.chat_type || 'Intent'}
+                        </span>
+                        {msg.intentStatus.priority_badge && msg.intentStatus.priority_badge !== '—' ? (
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                              String(msg.intentStatus.priority_badge).toLowerCase() === 'high'
+                                ? 'bg-rose-500/20 text-rose-200 ring-1 ring-rose-500/30'
+                                : 'bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-500/25'
+                            }`}
+                          >
+                            Priority: {msg.intentStatus.priority_badge}
+                          </span>
+                        ) : null}
+                        {msg.intentStatus.escalation_status === 'Escalated' ? (
+                          <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[11px] font-medium text-amber-100 ring-1 ring-amber-400/30">
+                            Escalated
+                          </span>
+                        ) : null}
+                      </div>
+                      {msg.intentStatus.title ? (
+                        <p className="mt-2 text-sm font-semibold text-white">{msg.intentStatus.title}</p>
+                      ) : null}
+                      {msg.intentStatus.subtitle ? (
+                        <p className="text-xs text-slate-400">{msg.intentStatus.subtitle}</p>
+                      ) : null}
+                      {msg.intentStatus.group_warning ? (
+                        <p className="mt-2 rounded-lg border border-amber-500/30 bg-amber-950/40 px-3 py-2 text-xs text-amber-100">
+                          {msg.intentStatus.group_warning}
+                        </p>
+                      ) : null}
+                      <dl className="mt-3 grid gap-2 text-xs text-slate-300 sm:grid-cols-2">
+                        {msg.intentStatus.allocation_status ? (
+                          <div className="flex justify-between gap-2 border-b border-white/5 pb-1">
+                            <dt className="text-slate-500">Allocation</dt>
+                            <dd className="text-right text-slate-200">{msg.intentStatus.allocation_status}</dd>
+                          </div>
+                        ) : null}
+                        {msg.intentStatus.authority_status ? (
+                          <div className="flex justify-between gap-2 border-b border-white/5 pb-1">
+                            <dt className="text-slate-500">Authority</dt>
+                            <dd className="text-right text-slate-200">{msg.intentStatus.authority_status}</dd>
+                          </div>
+                        ) : null}
+                      </dl>
+                      {Array.isArray(msg.intentStatus.timeline) && msg.intentStatus.timeline.length > 0 ? (
+                        <ol className="mt-3 space-y-1.5 border-t border-white/10 pt-3 text-[11px] text-slate-400">
+                          {msg.intentStatus.timeline.map((step, si) => (
+                            <li key={si} className="flex gap-2">
+                              <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-cyan-500/20 text-center text-[10px] leading-4 text-cyan-200">
+                                {si + 1}
+                              </span>
+                              <span className="text-slate-300">{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      ) : null}
+                    </div>
+                  ) : null}
                   {msg.scam?.show ? (
                     <div className="mt-3 rounded-xl border border-rose-500/40 bg-rose-950/50 p-3 text-xs text-rose-100">
                       <p className="font-semibold text-rose-200">{msg.scam.headline}</p>
@@ -268,8 +395,8 @@ export function ChatAssistant() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               rows={2}
-              placeholder="Type here, or use the mic to capture a complaint..."
-              className="min-h-[3rem] flex-1 resize-none rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
+              placeholder="Describe a problem, a new connection, or use the mic (Malayalam, Hindi, English, …)"
+              className="min-h-[3rem] flex-1 resize-none rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
             />
             <div className="flex gap-2">
               <button

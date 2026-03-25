@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
-RecordType = Literal["complaint", "scam", "service"]
+RecordType = Literal["complaint", "scam", "service", "request"]
 
 
 class RouteInputRequest(BaseModel):
@@ -25,6 +25,10 @@ class ComplaintRequest(BaseModel):
     text: str = Field(..., min_length=1)
     language: str = "auto"
     complaint_mode: str = "general"
+    taxonomy_domain_id: Optional[str] = None
+    taxonomy_item_id: Optional[str] = None
+    taxonomy_domain_title: Optional[str] = None
+    taxonomy_item_title: Optional[str] = None
 
 
 class ComplaintResponse(BaseModel):
@@ -88,6 +92,10 @@ class ServiceGuidanceRequest(BaseModel):
     text: str = Field(..., min_length=1)
     language: str = "auto"
     service_category: str = "auto"
+    taxonomy_domain_id: Optional[str] = None
+    taxonomy_item_id: Optional[str] = None
+    taxonomy_domain_title: Optional[str] = None
+    taxonomy_item_title: Optional[str] = None
 
 
 class ServiceInfoResponse(BaseModel):
@@ -109,6 +117,7 @@ class VoiceResponse(BaseModel):
     mode: str
     provider: str
     detail: str
+    detected_language: Optional[str] = None
 
 
 class DashboardResponse(BaseModel):
@@ -128,6 +137,7 @@ class DashboardResponse(BaseModel):
     top_area: str
     total_scam_checks: int
     total_service_queries: int
+    total_requests: int
     total_clusters: int
 
 
@@ -231,3 +241,8 @@ class ChatResponse(BaseModel):
     scam_banner: Optional[ScamBanner] = None
     case_complete: bool = False
     stage: str = "A"
+    # Intent + escalation module (optional; powers status UI)
+    intent_analysis: Optional[Dict[str, Any]] = None
+    frontend_status: Optional[Dict[str, Any]] = None
+    chat_mode: str = "free"
+    chat_signals: Optional[Dict[str, Any]] = None
